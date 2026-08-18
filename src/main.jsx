@@ -333,7 +333,51 @@ processing:apps.filter(x=>x.status==='processing').length,
 completed:apps.filter(x=>x.status==='completed').length,
 rejected:apps.filter(x=>x.status==='rejected').length
 };
+const now=new Date();
 
+const todayIncome=apps
+  .filter(a=>{
+    const d=new Date(a.created_at);
+    return d.toDateString()===now.toDateString();
+  })
+  .reduce((sum,a)=>sum+(Number(a.paid_paise)||0),0)/100;
+
+const monthIncome=apps
+  .filter(a=>{
+    const d=new Date(a.created_at);
+    return d.getMonth()===now.getMonth() &&
+           d.getFullYear()===now.getFullYear();
+  })
+  .reduce((sum,a)=>sum+(Number(a.paid_paise)||0),0)/100;
+
+const totalPaid=apps
+  .reduce((sum,a)=>sum+(Number(a.paid_paise)||0),0)/100;
+
+const totalBalance=apps
+  .reduce((sum,a)=>sum+
+    ((Number(a.fee_paise)||0)-(Number(a.paid_paise)||0)),0)/100;
+const today = new Date();
+
+const todayIncome = apps
+  .filter(a => {
+    const d = new Date(a.created_at);
+    return (
+      d.getDate() === today.getDate() &&
+      d.getMonth() === today.getMonth() &&
+      d.getFullYear() === today.getFullYear()
+    );
+  })
+  .reduce((sum, a) => sum + (Number(a.paid_paise) || 0), 0) / 100;
+
+const monthIncome = apps
+  .filter(a => {
+    const d = new Date(a.created_at);
+    return (
+      d.getMonth() === today.getMonth() &&
+      d.getFullYear() === today.getFullYear()
+    );
+  })
+  .reduce((sum, a) => sum + (Number(a.paid_paise) || 0), 0) / 100;
 return <>
 <header>
 <b>JOY ONLINE SERVICES</b>
@@ -378,6 +422,17 @@ Rejected:counts.rejected
 </div>
 )}
 
+</div>
+<div className="stats">
+  <div className="stat">
+    <small>Today Income</small>
+    <strong>₹{todayIncome.toFixed(2)}</strong>
+  </div>
+
+  <div className="stat">
+    <small>Monthly Income</small>
+    <strong>₹{monthIncome.toFixed(2)}</strong>
+  </div>
 </div>
 </>}
 
