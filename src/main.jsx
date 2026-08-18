@@ -367,8 +367,7 @@ const todayIncome = apps
       d.getFullYear() === today.getFullYear()
     );
   })
-  .reduce((sum, a) => sum + (Number(a.paid_paise) || 0), 0) / 100;
-
+.reduce((sum, a) => sum + (Number(a.paid_paise) || 0) / 100, 0);
 const monthIncome = apps
   .filter(a => {
     const d = new Date(a.created_at);
@@ -377,7 +376,7 @@ const monthIncome = apps
       d.getFullYear() === today.getFullYear()
     );
   })
-  .reduce((sum, a) => sum + (Number(a.paid_paise) || 0), 0) / 100;
+.reduce((sum, a) => sum + (Number(a.paid_paise) || 0) / 100, 0);
 return <>
 <header>
 <b>JOY ONLINE SERVICES</b>
