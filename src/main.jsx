@@ -566,6 +566,7 @@ function Drawer({app,close,refresh}){
 const[status,setStatus]=useState(app.status);
 const[docs,setDocs]=useState([]);
 const [documentType,setDocumentType]=useState('Other');
+const[uploading,setUploading]=useState(false);
 async function loadDocs(){
 
 const{data}=await supabase
