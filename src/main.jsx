@@ -415,16 +415,27 @@ refresh={load}
 
 function Applications({apps,refresh,select}){
   const [search,setSearch]=useState('');
+  const [statusFilter,setStatusFilter]=useState('All');
 
   const filteredApps=apps.filter(a=>
+  (statusFilter==='All' || a.status===statusFilter) &&
+  (
     (a.customer_name||'').toLowerCase().includes(search.toLowerCase()) ||
     (a.mobile||'').includes(search) ||
     (a.application_no||'').toLowerCase().includes(search.toLowerCase())
-  );
+  )
+);
 
   return <>
     <div className="row">
       <h2>Applications</h2>
+      <div className="row">
+  <button onClick={()=>setStatusFilter('All')}>All</button>
+  <button onClick={()=>setStatusFilter('pending')}>Pending</button>
+  <button onClick={()=>setStatusFilter('processing')}>Processing</button>
+  <button onClick={()=>setStatusFilter('completed')}>Completed</button>
+  <button onClick={()=>setStatusFilter('cancelled')}>Cancelled</button>
+</div>
 
       <input
         type="text"
