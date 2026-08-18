@@ -565,8 +565,7 @@ function Drawer({app,close,refresh}){
 
 const[status,setStatus]=useState(app.status);
 const[docs,setDocs]=useState([]);
-const[uploading,setUploading]=useState(false);
-
+const [documentType,setDocumentType]=useState('Other');
 async function loadDocs(){
 
 const{data}=await supabase
@@ -604,7 +603,7 @@ refresh();
 }
 
 
-async function upload(file){
+async function upload(file, documentType){
 
 if(!file)
 return;
@@ -637,10 +636,11 @@ alert(r.error.message);
 r=await supabase
 .from('documents')
 .insert({
-application_id:app.id,
-path,
-name:file.name,
-size:file.size
+  application_id:app.id,
+  path,
+  name:file.name,
+  size:file.size,
+  document_type:documentType
 });
 
 if(r.error)
@@ -721,6 +721,19 @@ Save
 </div>
 
 <h3>Private Documents</h3>
+  <label>Document Type</label>
+
+<select
+  value={documentType}
+  onChange={(e)=>setDocumentType(e.target.value)}
+>
+  <option value="Aadhaar">Aadhaar</option>
+  <option value="PAN">PAN</option>
+  <option value="Voter ID">Voter ID</option>
+  <option value="Photo">Photo</option>
+  <option value="Signature">Signature</option>
+  <option value="Other">Other</option>
+</select>
 
 <input
 type="file"
