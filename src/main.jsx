@@ -414,10 +414,23 @@ refresh={load}
 
 
 function Applications({apps,refresh,select}){
+const [search,setSearch]=useState('');
 
+const filteredApps=apps.filter(a=>
+    (a.customer_name||'').toLowerCase().includes(search.toLowerCase()) ||
+    (a.mobile||'').includes(search) ||
+    (a.application_no||'').toLowerCase().includes(search.toLowerCase())
+  );
+  
 return <>
 <div className="row">
 <h2>Applications</h2>
+<input
+type="text"
+placeholder="Search customer, mobile or application no..."
+value={search}
+onChange={e=>setSearch(e.target.value)}
+/>
 <button onClick={refresh}>Refresh</button>
 </div>
 
@@ -439,7 +452,7 @@ return <>
 
 <tbody>
 
-{apps.map(a=>
+{filteredApps.map(a=>
 <tr key={a.id} onClick={()=>select(a)}>
 <td>{a.application_no}</td>
 <td>{a.customer_name}</td>
@@ -529,6 +542,11 @@ await done();
 setBusy(false);
 }
 
+const filteredApps=apps.filter(a=>
+  (a.customer_name||'').toLowerCase().includes(search.toLowerCase()) ||
+  (a.mobile||'').includes(search) ||
+  (a.application_no||'').toLowerCase().includes(search.toLowerCase())
+);
 return <>
 <h2>New Application</h2>
 
