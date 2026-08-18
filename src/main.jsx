@@ -414,83 +414,125 @@ refresh={load}
 
 
 function Applications({apps,refresh,select}){
-const [search,setSearch]=useState('');
+  const [search,setSearch]=useState('');
 
-const filteredApps=apps.filter(a=>
+  const filteredApps=apps.filter(a=>
     (a.customer_name||'').toLowerCase().includes(search.toLowerCase()) ||
     (a.mobile||'').includes(search) ||
     (a.application_no||'').toLowerCase().includes(search.toLowerCase())
   );
-  
-return <>
-<div className="row">
-<h2>Applications</h2>
-<input
-type="text"
-placeholder="Search customer, mobile or application no..."
-value={search}
-onChange={e=>setSearch(e.target.value)}
-/>
-<button onClick={refresh}>Refresh</button>
-</div>
 
-<div className="card scroll">
+  return <>
+    <div className="row">
+      <h2>Applications</h2>
 
-<table>
-<thead>
-<tr>
-<th>No.</th>
-<th>Customer</th>
-<th>Mobile</th>
-<th>Service</th>
-<th>Total</th>
-<th>Paid</th>
-<th>Balance</th>
-<th>Status</th>
-</tr>
-</thead>
+      <input
+        type="text"
+        placeholder="Search customer, mobile or application no..."
+        value={search}
+        onChange={e=>setSearch(e.target.value)}
+      />
 
-<tbody>
+      <button onClick={refresh}>Refresh</button>
+    </div>
 
-{filteredApps.map(a=>
-<tr key={a.id} onClick={()=>select(a)}>
-<td>{a.application_no}</td>
-<td>{a.customer_name}</td>
-<td>{a.mobile}</td>
-<td>{a.service}</td>
+    <div className="card scroll">
+      <table>
 
-<td>₹{((a.fee_paise || 0) / 100).toFixed(2)}</td>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Customer</th>
+            <th>Mobile</th>
+            <th>Service</th>
+            <th>Total</th>
+            <th>Paid</th>
+            <th>Balance</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
 
-<td>₹{((a.paid_paise || 0) / 100).toFixed(2)}</td>
+        <tbody>
 
-<td>
-₹{(((a.fee_paise || 0) - (a.paid_paise || 0)) / 100).toFixed(2)}
-</td>
+          {filteredApps.map(a=>
+            <tr key={a.id}>
 
-<td>
-<span className={'status '+a.status}>
-{a.status}
-</span>
-</td>
-</tr>
-)}
+              <td onClick={()=>select(a)}>
+                {a.application_no}
+              </td>
 
-{!apps.length&&
-<tr>
-<td colSpan="5">
-No applications yet.
-</td>
-</tr>
+              <td onClick={()=>select(a)}>
+                {a.customer_name}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                {a.mobile}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                {a.service}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                ₹{((a.fee_paise||0)/100).toFixed(2)}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                ₹{((a.paid_paise||0)/100).toFixed(2)}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                ₹{(((a.fee_paise||0)-(a.paid_paise||0))/100).toFixed(2)}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                <span className={'status '+a.status}>
+                  {a.status}
+                </span>
+              </td>
+
+              <td>
+                <button
+                  onClick={async e=>{
+                    e.stopPropagation();
+
+                    if(!window.confirm('Delete this application?'))
+                      return;
+
+                    const {error}=await supabase
+                      .from('applications')
+                      .delete()
+                      .eq('id',a.id);
+
+                    if(error){
+                      alert(error.message);
+                    }else{
+                      alert('Application deleted');
+                      refresh();
+                    }
+                  }}
+                >
+                  🗑️ Delete
+                </button>
+              </td>
+
+            </tr>
+          )}
+
+          {!filteredApps.length &&
+            <tr>
+              <td colSpan="9">
+                No applications found.
+              </td>
+            </tr>
+          }
+
+        </tbody>
+      </table>
+    </div>
+  </>;
 }
-
-</tbody>
-</table>
-
-</div>
-</>;
-}
-
-
 function New({userId,done}){
 
 const[f,setF]=useState({
