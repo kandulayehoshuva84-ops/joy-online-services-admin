@@ -356,27 +356,7 @@ const totalPaid=apps
 const totalBalance=apps
   .reduce((sum,a)=>sum+
     ((Number(a.fee_paise)||0)-(Number(a.paid_paise)||0)),0)/100;
-const today = new Date();
 
-const todayIncome = apps
-  .filter(a => {
-    const d = new Date(a.created_at);
-    return (
-      d.getDate() === today.getDate() &&
-      d.getMonth() === today.getMonth() &&
-      d.getFullYear() === today.getFullYear()
-    );
-  })
-.reduce((sum, a) => sum + (Number(a.paid_paise) || 0) / 100, 0);
-const monthIncome = apps
-  .filter(a => {
-    const d = new Date(a.created_at);
-    return (
-      d.getMonth() === today.getMonth() &&
-      d.getFullYear() === today.getFullYear()
-    );
-  })
-.reduce((sum, a) => sum + (Number(a.paid_paise) || 0) / 100, 0);
 return <>
 <header>
 <b>JOY ONLINE SERVICES</b>
