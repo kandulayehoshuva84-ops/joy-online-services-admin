@@ -723,6 +723,16 @@ return <div className="backdrop" onClick={close}>
 <b>Mobile:</b> {app.mobile}
 </p>
 
+<button
+  className="primary"
+  onClick={()=>{
+const phone=(app.mobile||'').replace(/\D/g,'');
+    window.open(`https://wa.me/91${phone}`,'_blank');
+  }}
+>
+  WhatsApp Customer
+</button>
+
 <p>
 <b>Service:</b> {app.service}
 </p>
