@@ -629,11 +629,6 @@ await done();
 setBusy(false);
 }
 
-const filteredApps=apps.filter(a=>
-  (a.customer_name||'').toLowerCase().includes(search.toLowerCase()) ||
-  (a.mobile||'').includes(search) ||
-  (a.application_no||'').toLowerCase().includes(search.toLowerCase())
-);
 return <>
 <h2>New Application</h2>
 
