@@ -189,7 +189,7 @@ onChange={e=>setC(e.target.value)}
 }
 
 
-function App()function App(){
+function App(){
   const[session,setSession]=useState(null);
   const[profile,setProfile]=useState(null);
   const[loading,setLoading]=useState(true);
