@@ -189,147 +189,119 @@ onChange={e=>setC(e.target.value)}
 }
 
 
-function App(){
+function App()function App(){
+  const[session,setSession]=useState(null);
+  const[profile,setProfile]=useState(null);
+  const[loading,setLoading]=useState(true);
+  const[recovery,setRecovery]=useState(false);
 
-const[session,setSession]=useState(null);
-const[profile,setProfile]=useState(null);
-const[loading,setLoading]=useState(true);
-const[recovery,setRecovery]=useState(false);
+  useEffect(()=>{
+    let mounted=true;
 
-useEffect(()=>{
+    async function init(){
+      try{
+        const hash=window.location.hash||'';
+        const params=new URLSearchParams(
+          hash.startsWith('#') ? hash.slice(1) : hash
+        );
 
-let mounted=true;
+        const accessToken=params.get('access_token');
+        const refreshToken=params.get('refresh_token');
+        const type=params.get('type');
 
-async function initialize(){
+        if(type==='recovery' && accessToken && refreshToken){
+          const{data,error}=await supabase.auth.setSession({
+            access_token:accessToken,
+            refresh_token:refreshToken
+          });
 
-try{
+          if(error){
+            console.error(error);
+          }else if(mounted){
+            setSession(data.session);
+            setRecovery(true);
+          }
+        }else{
+          const{data}=await supabase.auth.getSession();
 
-const hash=window.location.hash||'';
+          if(mounted){
+            setSession(data.session);
 
-const params=new URLSearchParams(hash.substring(1));
+            if(type==='recovery'){
+              setRecovery(true);
+            }
+          }
+        }
+      }catch(error){
+        console.error(error);
+      }finally{
+        if(mounted)setLoading(false);
+      }
+    }
 
-const accessToken=params.get('access_token');
-const refreshToken=params.get('refresh_token');
-const type=params.get('type');
+    init();
 
-if(
-type==='recovery' ||
-accessToken
-){
+    const{data}=supabase.auth.onAuthStateChange((event,s)=>{
+      if(event==='PASSWORD_RECOVERY'){
+        setRecovery(true);
+      }
 
-setRecovery(true);
+      if(mounted)setSession(s);
+    });
 
-if(accessToken){
+    return()=>{
+      mounted=false;
+      data.subscription.unsubscribe();
+    };
+  },[]);
 
-const{data,error}=await supabase.auth.setSession({
-access_token:accessToken,
-refresh_token:refreshToken||''
-});
+  useEffect(()=>{
+    if(!session){
+      setProfile(null);
+      return;
+    }
 
-if(error){
-console.error('Recovery session error:',error);
-}else if(mounted){
-setSession(data.session);
+    supabase
+      .from('profiles')
+      .select('id,full_name,role')
+      .eq('id',session.user.id)
+      .single()
+      .then(({data})=>{
+        setProfile(data);
+      });
+  },[session]);
+
+  if(loading){
+    return <div className="center">Loading…</div>;
+  }
+
+  if(recovery){
+    if(!session){
+      return <div className="center">Preparing secure password reset…</div>;
+    }
+
+    return <ResetPassword/>;
+  }
+
+  if(!session){
+    return <Login/>;
+  }
+
+  if(!profile||profile.role!=='admin'){
+    return(
+      <div className="center">
+        <div className="card">
+          <h2>Access denied</h2>
+          <button onClick={()=>supabase.auth.signOut()}>
+            Sign out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return <Admin user={session.user} profile={profile}/>;
 }
-}
-
-}else{
-
-const{data}=await supabase.auth.getSession();
-
-if(mounted){
-setSession(data.session);
-}
-
-}
-
-}catch(error){
-
-console.error(error);
-
-}finally{
-
-if(mounted)
-setLoading(false);
-
-}
-
-}
-
-initialize();
-
-const{
-data:listener
-}=supabase.auth.onAuthStateChange((event,s)=>{
-
-console.log('Auth event:',event);
-
-if(event==='PASSWORD_RECOVERY'){
-setRecovery(true);
-}
-
-if(mounted){
-setSession(s);
-}
-
-});
-
-return()=>{
-mounted=false;
-listener.subscription.unsubscribe();
-};
-
-},[]);
-
-
-useEffect(()=>{
-
-if(!session){
-setProfile(null);
-return;
-}
-
-supabase
-.from('profiles')
-.select('id,full_name,role')
-.eq('id',session.user.id)
-.single()
-.then(({data,error})=>{
-
-if(error){
-console.error('Profile error:',error);
-}
-
-setProfile(data);
-
-});
-
-},[session]);
-
-
-if(recovery)
-return <ResetPassword/>;
-
-if(loading)
-return <div className="center">Loading…</div>;
-
-if(!session)
-return <Login/>;
-
-if(!profile||profile.role!=='admin')
-return <div className="center">
-<div className="card">
-<h2>Access denied</h2>
-<button onClick={()=>supabase.auth.signOut()}>
-Sign out
-</button>
-</div>
-</div>;
-
-return <Admin user={session.user} profile={profile}/>;
-}
-
-
 function Admin({user,profile}){
 
 const[tab,setTab]=useState('dashboard');
