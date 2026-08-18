@@ -430,6 +430,9 @@ return <>
 <th>Customer</th>
 <th>Mobile</th>
 <th>Service</th>
+<th>Total</th>
+<th>Paid</th>
+<th>Balance</th>
 <th>Status</th>
 </tr>
 </thead>
@@ -442,6 +445,15 @@ return <>
 <td>{a.customer_name}</td>
 <td>{a.mobile}</td>
 <td>{a.service}</td>
+
+<td>₹{((a.fee_paise || 0) / 100).toFixed(2)}</td>
+
+<td>₹{((a.paid_paise || 0) / 100).toFixed(2)}</td>
+
+<td>
+₹{(((a.fee_paise || 0) - (a.paid_paise || 0)) / 100).toFixed(2)}
+</td>
+
 <td>
 <span className={'status '+a.status}>
 {a.status}
@@ -566,6 +578,7 @@ function Drawer({app,close,refresh}){
 const[status,setStatus]=useState(app.status);
 const[docs,setDocs]=useState([]);
 const [documentType,setDocumentType]=useState('Other');
+const[paid,setPaid]=useState((app.paid_paise||0)/100);
 const[uploading,setUploading]=useState(false);
 async function loadDocs(){
 
@@ -590,6 +603,7 @@ const{error}=await supabase
 .from('applications')
 .update({
 status,
+paid_paise:Math.round((Number(paid)||0)*100),
 updated_at:new Date().toISOString()
 })
 .eq('id',app.id);
@@ -697,6 +711,27 @@ return <div className="backdrop" onClick={close}>
 
 <p>
 <b>Payment:</b> {app.payment_status}
+</p>
+<p>
+<b>Total Amount:</b> ₹{((app.fee_paise||0)/100).toFixed(2)}
+</p>
+
+<label>
+<b>Paid Amount</b>
+</label>
+
+<input
+type="number"
+min="0"
+step="0.01"
+value={paid}
+onChange={e=>setPaid(e.target.value)}
+/>
+
+<p>
+<b>Balance:</b> ₹{(
+((app.fee_paise||0)/100) - (Number(paid)||0)
+).toFixed(2)}
 </p>
 
 <h3>Status</h3>
