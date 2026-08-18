@@ -209,7 +209,7 @@ function App(){
         const refreshToken=params.get('refresh_token');
         const type=params.get('type');
 
-        if(type==='recovery' && accessToken && refreshToken){
+        if(accessToken && refreshToken){
           const{data,error}=await supabase.auth.setSession({
             access_token:accessToken,
             refresh_token:refreshToken
