@@ -634,22 +634,52 @@ return <>
 
 <form className="card form" onSubmit={save}>
 
-{[
-['customer_name','Customer name'],
-['mobile','Mobile'],
-['service','Service'],
-['fee','Fee (₹)']
-].map(x=>
-<div key={x[0]}>
-<label>{x[1]}</label>
+<div>
+<label>Customer name</label>
 <input
-name={x[0]}
-value={f[x[0]]}
+name="customer_name"
+value={f.customer_name}
 onChange={ch}
-required={x[0]!=='fee'}
+required
 />
 </div>
-)}
+
+<div>
+<label>Mobile</label>
+<input
+name="mobile"
+value={f.mobile}
+onChange={ch}
+required
+/>
+</div>
+
+<div>
+<label>Service</label>
+<select
+name="service"
+value={f.service}
+onChange={ch}
+required
+>
+<option value="">Select Service</option>
+<option value="Aadhaar Card">Aadhaar Card</option>
+<option value="PAN Card">PAN Card</option>
+<option value="Voter Card">Voter Card</option>
+<option value="Passport">Passport</option>
+<option value="Ration Card">Ration Card</option>
+<option value="Others">Others</option>
+</select>
+</div>
+
+<div>
+<label>Fee (₹)</label>
+<input
+name="fee"
+value={f.fee}
+onChange={ch}
+/>
+</div>
 
 <div className="full">
 <label>Address</label>
