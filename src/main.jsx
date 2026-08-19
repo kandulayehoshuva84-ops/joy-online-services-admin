@@ -505,11 +505,11 @@ select={setSelected}
       <p>No appointments added yet.</p>
 
       <button
-        className="primary"
-        onClick={() => alert('New Appointment')}
-      >
-        + New Appointment
-      </button>
+  className="primary"
+  onClick={() => alert('New Appointment Form')}
+>
+  + New Appointment
+</button>
 
       <button
         onClick={() => setTab('dashboard')}
