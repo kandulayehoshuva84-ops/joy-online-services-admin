@@ -513,15 +513,46 @@ refresh={load}
 function Applications({apps,refresh,select}){
   const [search,setSearch]=useState('');
   const [statusFilter,setStatusFilter]=useState('All');
+  const [dateFilter,setDateFilter]=useState('All');
+const [customDate,setCustomDate]=useState('');
 
-  const filteredApps=apps.filter(a=>
-  (statusFilter==='All' || a.status===statusFilter) &&
-  (
-    (a.customer_name||'').toLowerCase().includes(search.toLowerCase()) ||
-    (a.mobile||'').includes(search) ||
-    (a.application_no||'').toLowerCase().includes(search.toLowerCase())
-  )
-);
+  const filteredApps=apps.filter(a=>{
+  const appDate=a.created_at ? new Date(a.created_at) : null;
+  const today=new Date();
+
+  const sameDay=(d1,d2)=>
+    d1 && d2 && d1.toDateString()===d2.toDateString();
+
+  const dateMatch =
+    dateFilter==='All' ||
+    (dateFilter==='Today' && sameDay(appDate,today)) ||
+    (dateFilter==='Yesterday' &&
+      sameDay(
+        appDate,
+        new Date(today.getFullYear(),today.getMonth(),today.getDate()-1)
+      )
+    ) ||
+    (dateFilter==='This Month' &&
+      appDate &&
+      appDate.getMonth()===today.getMonth() &&
+      appDate.getFullYear()===today.getFullYear()
+    ) ||
+    (dateFilter==='Custom' &&
+      customDate &&
+      appDate &&
+      appDate.toISOString().slice(0,10)===customDate
+    );
+
+  return (
+    (statusFilter==='All' || a.status===statusFilter) &&
+    dateMatch &&
+    (
+      (a.customer_name||'').toLowerCase().includes(search.toLowerCase()) ||
+      (a.mobile||'').includes(search) ||
+      (a.application_no||'').toLowerCase().includes(search.toLowerCase())
+    )
+  );
+});
 
   return <>
     <div className="row">
@@ -532,6 +563,19 @@ function Applications({apps,refresh,select}){
   <button onClick={()=>setStatusFilter('processing')}>Processing</button>
   <button onClick={()=>setStatusFilter('completed')}>Completed</button>
   <button onClick={()=>setStatusFilter('cancelled')}>Cancelled</button>
+  <button onClick={()=>setDateFilter('All')}>All Dates</button>
+<button onClick={()=>setDateFilter('Today')}>Today</button>
+<button onClick={()=>setDateFilter('Yesterday')}>Yesterday</button>
+<button onClick={()=>setDateFilter('This Month')}>This Month</button>
+<button onClick={()=>setDateFilter('Custom')}>Custom Date</button>
+
+{dateFilter==='Custom' && (
+  <input
+    type="date"
+    value={customDate}
+    onChange={e=>setCustomDate(e.target.value)}
+  />
+)}
 </div>
 
       <input
