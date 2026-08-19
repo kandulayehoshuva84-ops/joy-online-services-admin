@@ -506,7 +506,7 @@ select={setSelected}
 
       <button
   className="primary"
-  onClick={() => alert('New Appointment Form')}
+  onClick={() => setTab('newAppointment')}
 >
   + New Appointment
 </button>
@@ -515,6 +515,55 @@ select={setSelected}
         onClick={() => setTab('dashboard')}
       >
         Back to Dashboard
+      </button>
+    </div>
+  </div>
+)}
+  {tab === 'newAppointment' && (
+  <div className="row">
+    <h2>📅 New Appointment</h2>
+
+    <div className="card">
+      <h3>Appointment Details</h3>
+
+      <label>Customer Name</label>
+      <input
+        type="text"
+        placeholder="Enter customer name"
+      />
+
+      <label>Mobile Number</label>
+      <input
+        type="tel"
+        placeholder="Enter mobile number"
+      />
+
+      <label>Service</label>
+      <input
+        type="text"
+        placeholder="Enter service"
+      />
+
+      <label>Appointment Date</label>
+      <input type="date" />
+
+      <label>Appointment Time</label>
+      <input type="time" />
+
+      <label>Notes</label>
+      <textarea
+        rows="4"
+        placeholder="Enter notes"
+      />
+
+      <br />
+
+      <button className="primary">
+        Save Appointment
+      </button>
+
+      <button onClick={() => setTab('appointments')}>
+        Cancel
       </button>
     </div>
   </div>
