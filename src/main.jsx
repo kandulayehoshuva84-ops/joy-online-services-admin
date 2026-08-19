@@ -412,6 +412,20 @@ Rejected:counts.rejected
     <small>Monthly Income</small>
     <strong>₹{monthIncome.toFixed(2)}</strong>
   </div>
+  <div className="stat">
+  <small>Total Paid</small>
+  <strong>
+    ₹{(apps.reduce((sum, a) => sum + (Number(a.paid_paise) || 0), 0) / 100).toFixed(2)}
+  </strong>
+</div>
+
+<div className="stat">
+  <small>Total Balance</small>
+  <strong>
+    ₹{(apps.reduce((sum, a) => sum + (Number(a.fee_paise) || 0), 0) / 100 -
+        apps.reduce((sum, a) => sum + (Number(a.paid_paise) || 0), 0) / 100).toFixed(2)}
+  </strong>
+</div>
 </div>
 </>}
 
