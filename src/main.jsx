@@ -861,6 +861,13 @@ const phone=(app.mobile||'').replace(/\D/g,'');
   WhatsApp Customer
 </button>
 
+<button
+  className="primary"
+  onClick={() => window.print()}
+>
+  Print Receipt
+</button>
+
 <p>
 <b>Service:</b> {app.service}
 </p>
