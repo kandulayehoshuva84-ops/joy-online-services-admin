@@ -480,8 +480,8 @@ Rejected:counts.rejected
 <div className="appointment-box">
   <h3>📅 Appointments</h3>
   <p>Manage today's appointments</p>
-  <button onClick={() => alert('Appointments')}>
-    View Appointments
+<button onClick={() => setTab('appointments')}>
+  View Appointments
   </button>
 </div>
 
@@ -495,7 +495,31 @@ select={setSelected}
 />
 }
 
-{tab==='new'&&
+{tab==='appointments' && (
+  <div className="row">
+    <h2>📅 Appointments</h2>
+
+    <div className="card">
+      <h3>Today's Appointments</h3>
+
+      <p>No appointments added yet.</p>
+
+      <button
+        className="primary"
+        onClick={() => alert('New Appointment')}
+      >
+        + New Appointment
+      </button>
+
+      <button
+        onClick={() => setTab('dashboard')}
+      >
+        Back to Dashboard
+      </button>
+    </div>
+  </div>
+)}
+  {tab==='new'&&
 <New
 userId={user.id}
 done={async()=>{
