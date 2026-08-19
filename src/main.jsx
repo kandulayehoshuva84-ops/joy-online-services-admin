@@ -866,6 +866,14 @@ const phone=(app.mobile||'').replace(/\D/g,'');
 </p>
 
 <p>
+<b>Address:</b> {app.address || 'Not provided'}
+</p>
+
+<p>
+<b>Application Date:</b> {app.created_at ? new Date(app.created_at).toLocaleDateString('en-IN') : 'Not available'}
+</p>
+
+<p>
 <b>Payment:</b> {app.payment_status}
 </p>
 <p>
