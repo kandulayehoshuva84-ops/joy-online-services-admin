@@ -581,6 +581,7 @@ function Applications({apps,refresh,select}){
 function New({userId,done}){
 
 const[f,setF]=useState({
+application_no:'',
 customer_name:'',
 mobile:'',
 service:'',
@@ -605,6 +606,7 @@ setBusy(true);
 const{error}=await supabase
 .from('applications')
 .insert({
+application_no: f.application_no || `JOY-${Date.now().toString().slice(-6)}`,
 customer_id:userId,
 customer_name:f.customer_name,
 mobile:f.mobile,
