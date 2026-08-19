@@ -403,6 +403,55 @@ Rejected:counts.rejected
 
 </div>
 <div className="stats">
+
+<div className="stat">
+<small>Today Applications</small>
+<strong>
+{apps.filter(a =>
+  a.created_at &&
+  new Date(a.created_at).toDateString() === new Date().toDateString()
+).length}
+</strong>
+</div>
+
+<div className="stat">
+<small>Today Pending</small>
+<strong>
+{apps.filter(a =>
+  a.created_at &&
+  new Date(a.created_at).toDateString() === new Date().toDateString() &&
+  (a.status === 'received' || a.status === 'processing')
+).length}
+</strong>
+</div>
+
+<div className="stat">
+<small>Today Completed</small>
+<strong>
+{apps.filter(a =>
+  a.created_at &&
+  new Date(a.created_at).toDateString() === new Date().toDateString() &&
+  a.status === 'completed'
+).length}
+</strong>
+</div>
+
+<div className="stat">
+<small>Today Collection</small>
+<strong>
+₹{(
+  apps
+    .filter(a =>
+      a.created_at &&
+      new Date(a.created_at).toDateString() === new Date().toDateString()
+    )
+    .reduce((sum, a) => sum + (Number(a.paid_paise) || 0), 0) / 100
+).toFixed(2)}
+</strong>
+</div>
+
+</div>
+<div className="stats">
   <div className="stat">
     <small>Today Income</small>
     <strong>₹{todayIncome.toFixed(2)}</strong>
