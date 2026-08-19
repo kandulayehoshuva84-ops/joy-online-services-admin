@@ -476,6 +476,15 @@ Rejected:counts.rejected
   </strong>
 </div>
 </div>
+
+<div className="appointment-box">
+  <h3>📅 Appointments</h3>
+  <p>Manage today's appointments</p>
+  <button onClick={() => alert('Appointments')}>
+    View Appointments
+  </button>
+</div>
+
 </>}
 
 {tab==='applications'&&
