@@ -912,7 +912,8 @@ customer_name:'',
 mobile:'',
 service:'',
 address:'',
-fee:''
+fee:'',
+notes:''
 });
 
 const[busy,setBusy]=useState(false);
@@ -938,6 +939,7 @@ customer_name:f.customer_name,
 mobile:f.mobile,
 service:f.service,
 address:f.address||null,
+notes:f.notes||null,
 fee_paise:Math.round((Number(f.fee)||0)*100),
 payment_status:'unpaid',
 status:'received'
@@ -1008,7 +1010,16 @@ value={f.fee}
 onChange={ch}
 />
 </div>
-
+<div className="full">
+  <label>Important Notes</label>
+  <textarea
+    name="notes"
+    rows="4"
+    placeholder="Enter important notes"
+    value={f.notes}
+    onChange={ch}
+  />
+</div>
 <div className="full">
 <label>Address</label>
 <textarea
