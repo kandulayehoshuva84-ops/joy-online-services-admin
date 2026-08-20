@@ -449,7 +449,10 @@ key={x[0]}>
 <main>
 
 {tab==='dashboard'&&<>
-<h2>Dashboard</h2>
+<div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+  <h2>Dashboard</h2>
+  <button onClick={load}>🔄 Refresh</button>
+</div>
 <p>Welcome, {profile.full_name||'Admin'}</p>
 
 <div className="stats">
