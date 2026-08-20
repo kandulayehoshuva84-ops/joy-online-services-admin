@@ -594,33 +594,68 @@ select={setSelected}
 
       <label>Customer Name</label>
       <input
-        type="text"
-        placeholder="Enter customer name"
-      />
+  type="text"
+  placeholder="Enter customer name"
+  value={appointment.customer_name}
+  onChange={e =>
+    setAppointment({...appointment, customer_name:e.target.value})
+  }
+/>
 
       <label>Mobile Number</label>
       <input
-        type="tel"
-        placeholder="Enter mobile number"
-      />
+  type="tel"
+  placeholder="Enter mobile number"
+  value={appointment.mobile}
+  onChange={e =>
+    setAppointment({...appointment, mobile:e.target.value})
+  }
+/>
 
       <label>Service</label>
       <input
-        type="text"
-        placeholder="Enter service"
-      />
+  type="text"
+  placeholder="Enter service"
+  value={appointment.service}
+  onChange={e =>
+    setAppointment({...appointment, service:e.target.value})
+  }
+/>
 
       <label>Appointment Date</label>
-      <input type="date" />
-
+<input
+  type="date"
+  value={appointment.appointment_date}
+  onChange={e =>
+    setAppointment({
+      ...appointment,
+      appointment_date: e.target.value
+    })
+  }
+/>
       <label>Appointment Time</label>
-      <input type="time" />
-
+<input
+  type="time"
+  value={appointment.appointment_time}
+  onChange={e =>
+    setAppointment({
+      ...appointment,
+      appointment_time: e.target.value
+    })
+  }
+/>
       <label>Notes</label>
       <textarea
-        rows="4"
-        placeholder="Enter notes"
-      />
+  rows="4"
+  placeholder="Enter notes"
+  value={appointment.notes}
+  onChange={e =>
+    setAppointment({
+      ...appointment,
+      notes: e.target.value
+    })
+  }
+/>
 
       <br />
 
