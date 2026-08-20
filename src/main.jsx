@@ -568,8 +568,26 @@ select={setSelected}
     <div className="card">
       <h3>Today's Appointments</h3>
 
-      <p>No appointments added yet.</p>
+{appointments.length === 0 ? (
+  <p>No appointments added yet.</p>
+) : (
+  <div className="appointment-list">
+    {appointments.map((a) => (
+      <div className="card" key={a.id} style={{marginTop:'15px'}}>
+        <h3>{a.customer_name}</h3>
 
+        <p><b>Mobile:</b> {a.mobile}</p>
+        <p><b>Service:</b> {a.service}</p>
+        <p><b>Date:</b> {a.appointment_date}</p>
+        <p><b>Time:</b> {a.appointment_time}</p>
+
+        {a.notes && (
+          <p><b>Notes:</b> {a.notes}</p>
+        )}
+      </div>
+    ))}
+  </div>
+)}
       <button
   className="primary"
   onClick={() => setTab('newAppointment')}
