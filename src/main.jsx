@@ -914,7 +914,6 @@ service:'',
 address:'',
 notes:'',
 fee:'',
-notes:''
 });
 
 const[busy,setBusy]=useState(false);
