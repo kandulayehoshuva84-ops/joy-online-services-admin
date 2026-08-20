@@ -912,6 +912,7 @@ customer_name:'',
 mobile:'',
 service:'',
 address:'',
+notes:'',
 fee:'',
 notes:''
 });
