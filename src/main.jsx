@@ -307,7 +307,73 @@ function Admin({user,profile}){
 const[tab,setTab]=useState('dashboard');
 const[apps,setApps]=useState([]);
 const[selected,setSelected]=useState(null);
+const[appointments,setAppointments]=useState([]);
+const[appointment,setAppointment]=useState({
+  customer_name:'',
+  mobile:'',
+  service:'',
+  appointment_date:'',
+  appointment_time:'',
+  notes:''
+});
+const[appointmentBusy,setAppointmentBusy]=useState(false);
 
+async function loadAppointments(){
+  const{data,error}=await supabase
+    .from('appointments')
+    .select('*')
+    .order('appointment_date',{ascending:true})
+    .order('appointment_time',{ascending:true});
+
+  if(error){
+    alert(error.message);
+  }else{
+    setAppointments(data||[]);
+  }
+}
+
+useEffect(()=>{
+  loadAppointments();
+},[]);
+async function saveAppointment(){
+  if(
+    !appointment.customer_name ||
+    !appointment.mobile ||
+    !appointment.service ||
+    !appointment.appointment_date ||
+    !appointment.appointment_time
+  ){
+    alert('Please fill all required fields');
+    return;
+  }
+
+  setAppointmentBusy(true);
+
+  const { error } = await supabase
+    .from('appointments')
+    .insert([appointment]);
+
+  setAppointmentBusy(false);
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  alert('Appointment saved successfully!');
+
+  setAppointment({
+    customer_name:'',
+    mobile:'',
+    service:'',
+    appointment_date:'',
+    appointment_time:'',
+    notes:''
+  });
+
+  await loadAppointments();
+  setTab('appointments');
+}  
 async function load(){
 
 const{data,error}=await supabase
@@ -558,9 +624,13 @@ select={setSelected}
 
       <br />
 
-      <button className="primary">
-        Save Appointment
-      </button>
+      <button
+  className="primary"
+  onClick={saveAppointment}
+  disabled={appointmentBusy}
+>
+  {appointmentBusy ? 'Saving...' : 'Save Appointment'}
+</button>
 
       <button onClick={() => setTab('appointments')}>
         Cancel
