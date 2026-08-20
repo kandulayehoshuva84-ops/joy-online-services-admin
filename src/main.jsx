@@ -462,6 +462,10 @@ key={x[0]}>
   , {profile.full_name || 'Admin'} 👋
 </p>
   
+<div style={{marginBottom:'15px'}}>
+  📅 Today: {new Date().toLocaleDateString('en-IN')}
+</div>
+  
 <div className="stats">
 
 {Object.entries({
