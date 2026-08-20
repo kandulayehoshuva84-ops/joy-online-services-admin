@@ -453,8 +453,15 @@ key={x[0]}>
   <h2>Dashboard</h2>
   <button onClick={load}>🔄 Refresh</button>
 </div>
-<p>Welcome, {profile.full_name||'Admin'}</p>
-
+<p>
+  {new Date().getHours() < 12
+    ? 'Good Morning'
+    : new Date().getHours() < 17
+    ? 'Good Afternoon'
+    : 'Good Evening'}
+  , {profile.full_name || 'Admin'} 👋
+</p>
+  
 <div className="stats">
 
 {Object.entries({
