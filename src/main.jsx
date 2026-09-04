@@ -1133,6 +1133,7 @@ const[status,setStatus]=useState(app.status);
 const[docs,setDocs]=useState([]);
 const [documentType,setDocumentType]=useState('Other');
 const[paid,setPaid]=useState((app.paid_paise||0)/100);
+const[notes,setNotes]=useState(app.notes||'');
 const[uploading,setUploading]=useState(false);
 
 async function loadDocs(){
@@ -1154,6 +1155,7 @@ const{error}=await supabase
 .update({
 status,
 paid_paise:Math.round((Number(paid)||0)*100),
+notes:notes||null,
 updated_at:new Date().toISOString()
 })
 .eq('id',app.id);
@@ -1314,6 +1316,16 @@ onChange={e=>upload(e.target.files?.[0],documentType)}
 <button onClick={()=>view(d)}>View securely</button>
 </div>
 )}
+</div>
+
+<div className="modal-panel notes-panel">
+<h3>Notes</h3>
+<textarea
+value={notes}
+onChange={e=>setNotes(e.target.value)}
+placeholder="Enter important notes"
+rows="4"
+/>
 </div>
 
 </section>
