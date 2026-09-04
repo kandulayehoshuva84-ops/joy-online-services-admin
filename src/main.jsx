@@ -457,7 +457,7 @@ return <div className="app-shell">
     </div>
     <div className="admin-user">
       <span className="admin-avatar">{(profile.full_name||'A').charAt(0).toUpperCase()}</span>
-      <strong>JOSHI JOY</strong>
+      <strong>{'JOSHI JOY'}</strong>
       <button onClick={()=>supabase.auth.signOut()}>Logout</button>
     </div>
   </div>
@@ -475,7 +475,7 @@ return <div className="app-shell">
     : new Date().getHours() < 17
     ? 'Good Afternoon'
     : 'Good Evening'}
-  , {profile.full_name || 'Admin'} 👋
+  , {'JOSHI JOY'} 👋
 </p>
   
 <div style={{marginBottom:'15px'}}>
@@ -1132,25 +1132,21 @@ const[docs,setDocs]=useState([]);
 const [documentType,setDocumentType]=useState('Other');
 const[paid,setPaid]=useState((app.paid_paise||0)/100);
 const[uploading,setUploading]=useState(false);
-async function loadDocs(){
 
+async function loadDocs(){
 const{data}=await supabase
 .from('documents')
 .select('*')
 .eq('application_id',app.id)
 .order('created_at',{ascending:false});
-
 setDocs(data||[]);
-
 }
 
 useEffect(()=>{
 loadDocs();
 },[app.id]);
 
-
 async function save(){
-
 const{error}=await supabase
 .from('applications')
 .update({
@@ -1166,12 +1162,9 @@ else{
 alert('Status updated');
 refresh();
 }
-
 }
 
-
 async function upload(file, documentType){
-
 if(!file)
 return;
 
@@ -1180,26 +1173,16 @@ return alert('File must be 10 MB or smaller.');
 
 setUploading(true);
 
-const safe=file.name.replace(
-/[^a-zA-Z0-9._-]/g,
-'_'
-);
-
-const path=
-`${app.id}/${Date.now()}-${safe}`;
+const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+const path=`${app.id}/${Date.now()}-${safe}`;
 
 let r=await supabase.storage
 .from(BUCKET)
-.upload(path,file,{
-contentType:file.type
-});
+.upload(path,file,{contentType:file.type});
 
 if(r.error){
-
 alert(r.error.message);
-
 }else{
-
 r=await supabase
 .from('documents')
 .insert({
@@ -1214,16 +1197,12 @@ if(r.error)
 alert(r.error.message);
 else
 await loadDocs();
-
 }
 
 setUploading(false);
-
 }
 
-
 async function view(d){
-
 const{data,error}=await supabase.storage
 .from(BUCKET)
 .createSignedUrl(d.path,120);
@@ -1232,71 +1211,35 @@ if(error)
 alert(error.message);
 else
 window.open(data.signedUrl,'_blank');
-
 }
 
-
 return <div className="backdrop" onClick={close}>
+<aside className="application-modal" onClick={e=>e.stopPropagation()}>
 
-<aside onClick={e=>e.stopPropagation()}>
-
-<div className="row">
-
+<div className="modal-header">
 <div>
 <b>{app.application_no}</b>
 <div>{app.customer_name}</div>
 </div>
-
 <button onClick={close}>✕</button>
-
 </div>
 
-<hr/>
+<div className="modal-grid">
 
-<p>
-<b>Mobile:</b> {app.mobile}
-</p>
+<section className="modal-panel application-details">
+<h3>Application Details</h3>
 
-<button
-  className="primary"
-  onClick={()=>{
-const phone=(app.mobile||'').replace(/\D/g,'');
-    window.open(`https://wa.me/91${phone}`,'_blank');
-  }}
->
-  WhatsApp Customer
-</button>
+<p><b>Application No.</b><span>{app.application_no}</span></p>
+<p><b>Customer Name</b><span>{app.customer_name}</span></p>
+<p><b>Mobile</b><span>{app.mobile}</span></p>
+<p><b>Service</b><span>{app.service}</span></p>
+<p><b>Address</b><span>{app.address || 'Not provided'}</span></p>
+<p><b>Application Date</b><span>{app.created_at ? new Date(app.created_at).toLocaleDateString('en-IN') : 'Not available'}</span></p>
+<p><b>Payment Status</b><span>{app.payment_status}</span></p>
+<p><b>Total Amount</b><span>₹{((app.fee_paise||0)/100).toFixed(2)}</span></p>
 
-<button
-  className="primary"
-  onClick={() => window.print()}
->
-  Print Receipt
-</button>
-
-<p>
-<b>Service:</b> {app.service}
-</p>
-
-<p>
-<b>Address:</b> {app.address || 'Not provided'}
-</p>
-
-<p>
-<b>Application Date:</b> {app.created_at ? new Date(app.created_at).toLocaleDateString('en-IN') : 'Not available'}
-</p>
-
-<p>
-<b>Payment:</b> {app.payment_status}
-</p>
-<p>
-<b>Total Amount:</b> ₹{((app.fee_paise||0)/100).toFixed(2)}
-</p>
-
-<label>
-<b>Paid Amount</b>
-</label>
-
+<div className="field-row">
+<label><b>Paid Amount</b></label>
 <input
 type="number"
 min="0"
@@ -1304,78 +1247,78 @@ step="0.01"
 value={paid}
 onChange={e=>setPaid(e.target.value)}
 />
+</div>
 
-<p>
-<b>Balance:</b> ₹{(
+<p><b>Balance</b><span>₹{(
 ((app.fee_paise||0)/100) - (Number(paid)||0)
-).toFixed(2)}
-</p>
+).toFixed(2)}</span></p>
 
-<h3>Status</h3>
-
-<div className="row">
-
-<select
-value={status}
-onChange={e=>setStatus(e.target.value)}
->
-
+<label><b>Status</b></label>
+<select value={status} onChange={e=>setStatus(e.target.value)}>
 <option>received</option>
 <option>processing</option>
 <option>completed</option>
 <option>rejected</option>
-
 </select>
 
-<button className="primary" onClick={save}>
+<button className="primary save-button" onClick={save}>
 Save
 </button>
+</section>
 
+<section className="modal-right">
+
+<div className="modal-actions">
+<button className="primary" onClick={()=>{
+const phone=(app.mobile||'').replace(/\D/g,'');
+window.open(`https://wa.me/91${phone}`,'_blank');
+}}>
+WhatsApp Customer
+</button>
+
+<button className="primary" onClick={() => window.print()}>
+Print Receipt
+</button>
 </div>
 
+<div className="modal-panel">
 <h3>Private Documents</h3>
-  <label>Document Type</label>
-
-<select
-  value={documentType}
-  onChange={(e)=>setDocumentType(e.target.value)}
->
-  <option value="Aadhaar">Aadhaar</option>
-  <option value="PAN">PAN</option>
-  <option value="Voter ID">Voter ID</option>
-  <option value="Photo">Photo</option>
-  <option value="Signature">Signature</option>
-  <option value="Other">Other</option>
+<label>Document Type</label>
+<select value={documentType} onChange={e=>setDocumentType(e.target.value)}>
+<option value="Aadhaar">Aadhaar</option>
+<option value="PAN">PAN</option>
+<option value="Voter ID">Voter ID</option>
+<option value="Photo">Photo</option>
+<option value="Signature">Signature</option>
+<option value="Other">Other</option>
 </select>
 
 <input
 type="file"
 accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
 disabled={uploading}
-onChange={e=>upload(e.target.files?.[0])}
+onChange={e=>upload(e.target.files?.[0],documentType)}
 />
 
-<p>
-PDF/JPG/PNG, maximum 10 MB.
-</p>
+<p>PDF/JPG/PNG, maximum 10 MB.</p>
+</div>
 
+<div className="modal-panel uploaded-panel">
+<h3>Uploaded Documents</h3>
+{docs.length===0&&<p>No documents uploaded.</p>}
 {docs.map(d=>
 <div className="doc" key={d.id}>
-
 <span>{d.name}</span>
-
-<button onClick={()=>view(d)}>
-View securely
-</button>
-
+<button onClick={()=>view(d)}>View securely</button>
 </div>
 )}
+</div>
 
+</section>
+</div>
 </aside>
-
 </div>;
 }
-
 
 createRoot(
 document.getElementById('root')
