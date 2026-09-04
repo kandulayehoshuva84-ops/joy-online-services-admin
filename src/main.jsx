@@ -557,7 +557,48 @@ Rejected:counts.rejected
 </div>
 </div>
 
-<div className="appointment-box">
+<div style={{
+  display:'grid',
+  gridTemplateColumns:'repeat(4,minmax(0,1fr))',
+  gap:'14px',
+  margin:'22px 0'
+}}>
+
+{[
+  ['🪪','Aadhaar Card'],
+  ['💳','PAN Card'],
+  ['🗳️','Voter Card'],
+  ['🚘','Driving Licence']
+].map(([icon,name])=>(
+  <div
+    key={name}
+    className="card"
+    style={{
+      textAlign:'center',
+      cursor:'pointer',
+      padding:'22px 12px',
+      transition:'transform .15s ease'
+    }}
+    onClick={()=>setTab('new')}
+  >
+    <div style={{
+      fontSize:'46px',
+      marginBottom:'10px'
+    }}>
+      {icon}
+    </div>
+
+    <strong style={{
+      fontSize:'16px',
+      color:'#14213d'
+    }}>
+      {name}
+    </strong>
+  </div>
+))}
+
+</div>
+  <div className="appointment-box">
 <h3>📅 Appointments ({appointments.length})</h3>
   <p>Manage today's appointments</p>
 <button onClick={() => setTab('appointments')}>
