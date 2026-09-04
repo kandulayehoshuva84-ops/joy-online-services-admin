@@ -1081,6 +1081,8 @@ required
 <option value="Voter Card">Voter Card</option>
 <option value="Passport">Passport</option>
 <option value="Ration Card">Ration Card</option>
+<option value="BIRTH CERTIFICATE CORRECTION">BIRTH CERTIFICATE CORRECTION</option>
+<option value="AP STATE GAZZETTE">AP STATE GAZZETTE</option>
 <option value="Others">Others</option>
 </select>
 </div>
