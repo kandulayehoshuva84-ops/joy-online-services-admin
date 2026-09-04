@@ -1216,7 +1216,7 @@ window.open(data.signedUrl,'_blank');
 return <div className="backdrop" onClick={close}>
 <aside className="application-modal" onClick={e=>e.stopPropagation()}>
 
-<div className="modal-header">
+<div className="modal-header" style={{display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%"}}>
 <div>
 <b>{app.application_no}</b>
 <div>{app.customer_name}</div>
@@ -1224,19 +1224,19 @@ return <div className="backdrop" onClick={close}>
 <button onClick={close}>✕</button>
 </div>
 
-<div className="modal-grid">
+<div className="modal-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"18px",alignItems:"start"}}>
 
-<section className="modal-panel application-details">
+<section className="modal-panel application-details" style={{background:"#f8fafc",border:"1px solid #e5eaf2",borderRadius:"12px",padding:"20px"}}>
 <h3>Application Details</h3>
 
-<p><b>Application No.</b><span>{app.application_no}</span></p>
-<p><b>Customer Name</b><span>{app.customer_name}</span></p>
-<p><b>Mobile</b><span>{app.mobile}</span></p>
-<p><b>Service</b><span>{app.service}</span></p>
-<p><b>Address</b><span>{app.address || 'Not provided'}</span></p>
-<p><b>Application Date</b><span>{app.created_at ? new Date(app.created_at).toLocaleDateString('en-IN') : 'Not available'}</span></p>
-<p><b>Payment Status</b><span>{app.payment_status}</span></p>
-<p><b>Total Amount</b><span>₹{((app.fee_paise||0)/100).toFixed(2)}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Application No.</b><span>{app.application_no}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Customer Name</b><span>{app.customer_name}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Mobile</b><span>{app.mobile}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Service</b><span>{app.service}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Address</b><span>{app.address || 'Not provided'}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Application Date</b><span>{app.created_at ? new Date(app.created_at).toLocaleDateString('en-IN') : 'Not available'}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Payment Status</b><span>{app.payment_status}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Total Amount</b><span>₹{((app.fee_paise||0)/100).toFixed(2)}</span></p>
 
 <div className="field-row">
 <label><b>Paid Amount</b></label>
@@ -1249,7 +1249,7 @@ onChange={e=>setPaid(e.target.value)}
 />
 </div>
 
-<p><b>Balance</b><span>₹{(
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Balance</b><span>₹{(
 ((app.fee_paise||0)/100) - (Number(paid)||0)
 ).toFixed(2)}</span></p>
 
@@ -1266,9 +1266,9 @@ Save
 </button>
 </section>
 
-<section className="modal-right">
+<section className="modal-right" style={{display:"flex",flexDirection:"column",gap:"16px",minWidth:0}}>
 
-<div className="modal-actions">
+<div className="modal-actions" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px"}}>
 <button className="primary" onClick={()=>{
 const phone=(app.mobile||'').replace(/\D/g,'');
 window.open(`https://wa.me/91${phone}`,'_blank');
