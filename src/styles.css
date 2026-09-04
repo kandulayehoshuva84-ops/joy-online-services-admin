@@ -186,3 +186,48 @@ th,td{padding:13px;border-bottom:1px solid #eef0f3;text-align:left;white-space:n
     grid-template-columns:1fr;
   }
 }
+
+/* Final modal-only override */
+.backdrop aside.application-modal{
+  width:min(1400px,92vw) !important;
+  height:min(820px,90vh) !important;
+  left:50% !important;
+  top:50% !important;
+  right:auto !important;
+  transform:translate(-50%,-50%) !important;
+  overflow:auto !important;
+}
+.application-modal .modal-grid{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+  gap:18px !important;
+  align-items:start !important;
+}
+.application-modal .modal-right{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:16px !important;
+  min-width:0 !important;
+}
+.application-modal .modal-actions{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:10px !important;
+}
+.application-modal .application-details p{
+  display:grid !important;
+  grid-template-columns:170px minmax(0,1fr) !important;
+  gap:14px !important;
+  margin:0 !important;
+  padding:7px 0 !important;
+}
+.application-modal .application-details input,
+.application-modal .application-details select{
+  width:100% !important;
+  box-sizing:border-box !important;
+}
+@media(max-width:900px){
+  .application-modal .modal-grid{
+    grid-template-columns:1fr !important;
+  }
+}
