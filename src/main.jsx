@@ -894,7 +894,6 @@ const [customDate,setCustomDate]=useState('');
             <th>Customer</th>
             <th>Mobile</th>
             <th>Service</th>
-            <th>Notes</th>
             <th>Total</th>
             <th>Paid</th>
             <th>Balance</th>
@@ -924,10 +923,6 @@ const [customDate,setCustomDate]=useState('');
                 {a.service}
               </td>
 
-              <td onClick={()=>select(a)}>
-              {a.notes || '-'}
-              </td>
-              
               <td onClick={()=>select(a)}>
                 ₹{((a.fee_paise||0)/100).toFixed(2)}
               </td>
