@@ -1,430 +1,1345 @@
-*{box-sizing:border-box}
+import React,{useEffect,useState}from'react';
+import{createRoot}from'react-dom/client';
+import{supabase}from'./supabase';
+import'./styles.css';
 
-:root{
-  --navy:#111827;
-  --navy2:#1f2937;
-  --page:#f1f3f6;
-  --muted:#64748b;
-  --border:#e5e7eb;
-  --white:#fff;
-  --accent:#2563eb;
+const BUCKET='Documents';
+
+function Login(){
+const[email,setEmail]=useState('');
+const[password,setPassword]=useState('');
+const[err,setErr]=useState('');
+const[busy,setBusy]=useState(false);
+const[forgot,setForgot]=useState(false);
+const[msg,setMsg]=useState('');
+
+async function login(e){
+e.preventDefault();
+setBusy(true);
+setErr('');
+const{error}=await supabase.auth.signInWithPassword({email,password});
+if(error)setErr(error.message);
+setBusy(false);
 }
 
-html,body,#root{
-  min-height:100%;
-  margin:0;
+async function reset(e){
+e.preventDefault();
+setBusy(true);
+setErr('');
+setMsg('');
+
+const{error}=await supabase.auth.resetPasswordForEmail(email,{
+redirectTo:window.location.origin+'/'
+});
+
+if(error)setErr(error.message);
+else setMsg('Reset link sent. Please open the newest email.');
+
+setBusy(false);
 }
 
-body{
-  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:var(--page);
-  color:#0f172a;
+if(forgot)
+return <div className="login">
+<form className="loginbox" onSubmit={reset}>
+<div className="logo">J</div>
+<h1>JOY ONLINE SERVICES</h1>
+<p>Reset Admin Password</p>
+
+<label>Email</label>
+<input
+type="email"
+required
+value={email}
+onChange={e=>setEmail(e.target.value)}
+/>
+
+{err&&<div className="err">{err}</div>}
+{msg&&<div className="success">{msg}</div>}
+
+<button className="primary" disabled={busy}>
+{busy?'Sending…':'Send Reset Link'}
+</button>
+
+<button
+type="button"
+className="secondary"
+onClick={()=>{
+setForgot(false);
+setErr('');
+setMsg('');
+}}>
+Back to Login
+</button>
+</form>
+</div>;
+
+return <div className="login">
+<form className="loginbox" onSubmit={login}>
+<div className="logo">J</div>
+<h1>JOY ONLINE SERVICES</h1>
+<p>Secure Admin Portal</p>
+
+<label>Email</label>
+<input
+type="email"
+required
+value={email}
+onChange={e=>setEmail(e.target.value)}
+/>
+
+<label>Password</label>
+<input
+type="password"
+required
+value={password}
+onChange={e=>setPassword(e.target.value)}
+/>
+
+{err&&<div className="err">{err}</div>}
+
+<button className="primary" disabled={busy}>
+{busy?'Signing in…':'Admin Login'}
+</button>
+
+<button
+type="button"
+className="linkbutton"
+onClick={()=>{
+setForgot(true);
+setErr('');
+}}>
+Forgot password?
+</button>
+</form>
+</div>;
 }
 
-button,input,textarea,select{
-  font:inherit;
+
+function ResetPassword(){
+const[p,setP]=useState('');
+const[c,setC]=useState('');
+const[err,setErr]=useState('');
+const[msg,setMsg]=useState('');
+const[busy,setBusy]=useState(false);
+
+async function save(e){
+e.preventDefault();
+setErr('');
+setMsg('');
+
+if(p.length<6)
+return setErr('Password must be at least 6 characters.');
+
+if(p!==c)
+return setErr('Passwords do not match.');
+
+setBusy(true);
+
+const{error}=await supabase.auth.updateUser({
+password:p
+});
+
+if(error){
+setErr(error.message);
+}else{
+setMsg('Password changed successfully.');
+
+setTimeout(()=>{
+window.location.href=window.location.origin;
+},1500);
 }
 
-button{
-  border:0;
-  border-radius:10px;
-  padding:10px 14px;
-  background:#e5e7eb;
-  color:#111827;
-  cursor:pointer;
-  transition:.15s ease;
+setBusy(false);
 }
 
-button:hover{
-  filter:brightness(.97);
-  transform:translateY(-1px);
+return <div className="login">
+<form className="loginbox" onSubmit={save}>
+
+<div className="logo">J</div>
+<h1>JOY ONLINE SERVICES</h1>
+<p>Set New Admin Password</p>
+
+<label>New Password</label>
+<input
+type="password"
+minLength="6"
+required
+value={p}
+onChange={e=>setP(e.target.value)}
+/>
+
+<label>Confirm Password</label>
+<input
+type="password"
+minLength="6"
+required
+value={c}
+onChange={e=>setC(e.target.value)}
+/>
+
+{err&&<div className="err">{err}</div>}
+{msg&&<div className="success">{msg}</div>}
+
+<button className="primary" disabled={busy}>
+{busy?'Saving…':'Change Password'}
+</button>
+
+</form>
+</div>;
 }
 
-button:disabled{
-  opacity:.65;
-  cursor:not-allowed;
-  transform:none;
-}
 
-button.primary{
-  background:var(--navy);
-  color:white;
-}
+function App(){
+  const[session,setSession]=useState(null);
+  const[profile,setProfile]=useState(null);
+  const[loading,setLoading]=useState(true);
+  const[recovery,setRecovery]=useState(false);
 
-.center{
-  min-height:100vh;
-  display:grid;
-  place-items:center;
-}
+  useEffect(()=>{
+    let mounted=true;
 
-.login{
-  min-height:100vh;
-  display:grid;
-  place-items:center;
-  padding:20px;
-  background:var(--navy);
-}
+    async function init(){
+      try{
+        const hash=window.location.hash||'';
+        const params=new URLSearchParams(
+          hash.startsWith('#') ? hash.slice(1) : hash
+        );
 
-.loginbox{
-  background:white;
-  padding:30px;
-  border-radius:20px;
-  width:min(420px,100%);
-  box-shadow:0 18px 50px #00000026;
-}
+        const accessToken=params.get('access_token');
+        const refreshToken=params.get('refresh_token');
+        const type=params.get('type');
 
-.logo{
-  width:55px;
-  height:55px;
-  background:var(--navy);
-  color:white;
-  border-radius:15px;
-  display:grid;
-  place-items:center;
-  font-size:28px;
-  font-weight:800;
-}
+        if(accessToken && refreshToken){
+          const{data,error}=await supabase.auth.setSession({
+            access_token:accessToken,
+            refresh_token:refreshToken
+          });
 
-.loginbox h1{
-  font-size:22px;
-  margin:16px 0 6px;
-}
+          if(error){
+            console.error(error);
+          }else if(mounted){
+            setSession(data.session);
+            setRecovery(true);
+          }
+        }else{
+          const{data}=await supabase.auth.getSession();
 
-.loginbox p{
-  color:var(--muted);
-}
+          if(mounted){
+            setSession(data.session);
 
-.loginbox label,
-.form label{
-  display:block;
-  font-weight:700;
-  font-size:13px;
-  margin:12px 0 5px;
-}
+            if(type==='recovery'){
+              setRecovery(true);
+            }
+          }
+        }
+      }catch(error){
+        console.error(error);
+      }finally{
+        if(mounted)setLoading(false);
+      }
+    }
 
-.loginbox input,
-.form input,
-.form textarea,
-select{
-  width:100%;
-  padding:11px;
-  border:1px solid #d1d5db;
-  border-radius:10px;
-  background:white;
-  outline:none;
-}
+    init();
 
-.loginbox input:focus,
-.form input:focus,
-.form textarea:focus,
-select:focus{
-  border-color:#94a3b8;
-  box-shadow:0 0 0 3px #64748b18;
-}
+    const{data}=supabase.auth.onAuthStateChange((event,s)=>{
+      if(event==='PASSWORD_RECOVERY'){
+        setRecovery(true);
+      }
 
-.loginbox button{
-  width:100%;
-  margin-top:16px;
-}
+      if(mounted)setSession(s);
+    });
 
-.err{
-  background:#fee2e2;
-  color:#991b1b;
-  padding:10px;
-  border-radius:9px;
-  margin-top:10px;
-}
+    return()=>{
+      mounted=false;
+      data.subscription.unsubscribe();
+    };
+  },[]);
 
-.success{
-  background:#dcfce7;
-  color:#166534;
-  padding:10px;
-  border-radius:9px;
-  margin-top:10px;
-}
+  useEffect(()=>{
+    if(!session){
+      setProfile(null);
+      return;
+    }
 
-.linkbutton{
-  background:transparent;
-  color:#2563eb;
-  padding:8px;
-}
+    supabase
+      .from('profiles')
+      .select('id,full_name,role')
+      .eq('id',session.user.id)
+      .single()
+      .then(({data})=>{
+        setProfile(data);
+      });
+  },[session]);
 
-.secondary{
-  background:#eef0f3;
-}
+  if(loading){
+    return <div className="center">Loading…</div>;
+  }
 
-header{
-  background:var(--navy);
-  color:white;
-  padding:17px 22px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  min-height:64px;
-}
+  if(recovery){
+    if(!session){
+      return <div className="center">Preparing secure password reset…</div>;
+    }
 
-header b{
-  font-size:18px;
-  letter-spacing:.1px;
-}
+    return <ResetPassword/>;
+  }
 
-header button{
-  background:#374151;
-  color:white;
-}
+  if(!session){
+    return <Login/>;
+  }
 
-nav{
-  background:white;
-  border-bottom:1px solid #dfe3e8;
-  padding:9px 12px;
-  display:flex;
-  gap:7px;
-  overflow:auto;
-}
+  if(!profile||profile.role!=='admin'){
+    return(
+      <div className="center">
+        <div className="card">
+          <h2>Access denied</h2>
+          <button onClick={()=>supabase.auth.signOut()}>
+            Sign out
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-nav button{
-  white-space:nowrap;
-  background:#e7e9ed;
-  padding:11px 16px;
+  return <Admin user={session.user} profile={profile}/>;
 }
+function Admin({user,profile}){
 
-nav button.active{
-  background:var(--navy);
-  color:white;
-}
+const[tab,setTab]=useState('dashboard');
+const[apps,setApps]=useState([]);
+const[selected,setSelected]=useState(null);
+const[appointments,setAppointments]=useState([]);
+const[appointment,setAppointment]=useState({
+  customer_name:'',
+  mobile:'',
+  service:'',
+  appointment_date:'',
+  appointment_time:'',
+  notes:''
+});
+const[appointmentBusy,setAppointmentBusy]=useState(false);
 
-main{
-  max-width:1168px;
-  margin:auto;
-  padding:30px 24px 45px;
-}
+async function loadAppointments(){
+  const{data,error}=await supabase
+    .from('appointments')
+    .select('*')
+    .order('appointment_date',{ascending:true})
+    .order('appointment_time',{ascending:true});
 
-main h2{
-  font-size:28px;
-  margin:8px 0 24px;
-  color:#14213d;
-}
-
-main h3{
-  color:#14213d;
-}
-
-main p{
-  color:#17304f;
-}
-
-.row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:12px;
-  margin:0 0 12px;
-}
-
-.stat,
-.card{
-  background:var(--white);
-  border-radius:16px;
-  padding:17px;
-  box-shadow:0 4px 18px #0f172a0d;
-  border:1px solid #eef0f3;
-}
-
-.stat{
-  min-height:96px;
-}
-
-.stat small{
-  display:block;
-  color:#64748b;
-  font-size:14px;
-  margin-bottom:4px;
-}
-
-.stat strong{
-  font-size:30px;
-  line-height:1.1;
-  color:#111827;
-}
-
-.appointment-box{
-  background:white;
-  border-radius:16px;
-  padding:20px;
-  margin-top:18px;
-  box-shadow:0 4px 18px #0f172a0d;
-  border:1px solid #eef0f3;
-}
-
-.appointment-box h3{
-  margin:0 0 8px;
-}
-
-.appointment-box p{
-  margin:0 0 14px;
-  color:#64748b;
-}
-
-.scroll{
-  overflow:auto;
-  margin-top:12px;
-}
-
-table{
-  width:100%;
-  min-width:700px;
-  border-collapse:collapse;
-  background:white;
-}
-
-th,td{
-  padding:13px;
-  border-bottom:1px solid #eef0f3;
-  text-align:left;
-  white-space:nowrap;
-}
-
-th{
-  color:#64748b;
-  font-size:13px;
-  background:#f8fafc;
-}
-
-tr{
-  cursor:pointer;
-}
-
-.status{
-  padding:5px 9px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:700;
-  text-transform:capitalize;
-}
-
-.received{
-  background:#dbeafe;
-  color:#1d4ed8;
-}
-
-.processing{
-  background:#fef3c7;
-  color:#92400e;
-}
-
-.completed{
-  background:#dcfce7;
-  color:#166534;
-}
-
-.rejected{
-  background:#fee2e2;
-  color:#991b1b;
-}
-
-.pending{
-  background:#fef3c7;
-  color:#92400e;
-}
-
-.cancelled{
-  background:#fee2e2;
-  color:#991b1b;
-}
-
-.form{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px 14px;
-}
-
-.full{
-  grid-column:1/-1;
-}
-
-.backdrop{
-  position:fixed;
-  inset:0;
-  background:#0008;
-  z-index:20;
-}
-
-.backdrop aside{
-  background:white;
-  position:absolute;
-  right:0;
-  top:0;
-  height:100%;
-  width:min(560px,100%);
-  padding:20px;
-  overflow:auto;
-  box-shadow:-10px 0 35px #0002;
-}
-
-.doc{
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  border:1px solid #ddd;
-  padding:10px;
-  border-radius:9px;
-  margin-top:8px;
-}
-
-.doc span{
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-@media(max-width:900px){
-  .stats{
-    grid-template-columns:repeat(3,1fr);
+  if(error){
+    alert(error.message);
+  }else{
+    setAppointments(data||[]);
   }
 }
 
-@media(max-width:700px){
-  header{
-    padding:15px;
+useEffect(()=>{
+  loadAppointments();
+},[]);
+async function saveAppointment(){
+  if(
+    !appointment.customer_name ||
+    !appointment.mobile ||
+    !appointment.service ||
+    !appointment.appointment_date ||
+    !appointment.appointment_time
+  ){
+    alert('Please fill all required fields');
+    return;
   }
 
-  header b{
-    font-size:16px;
+  setAppointmentBusy(true);
+
+  const { error } = await supabase
+    .from('appointments')
+    .insert([appointment]);
+
+  setAppointmentBusy(false);
+
+  if(error){
+    alert(error.message);
+    return;
   }
 
-  main{
-    padding:20px 12px 35px;
-  }
+  alert('Appointment saved successfully!');
 
-  main h2{
-    font-size:24px;
-  }
+  setAppointment({
+    customer_name:'',
+    mobile:'',
+    service:'',
+    appointment_date:'',
+    appointment_time:'',
+    notes:''
+  });
 
-  .stats{
-    grid-template-columns:1fr 1fr;
-  }
+  await loadAppointments();
+  setTab('appointments');
+}  
+async function load(){
 
-  .form{
-    grid-template-columns:1fr;
-  }
+const{data,error}=await supabase
+.from('applications')
+.select('*')
+.order('created_at',{ascending:false});
 
-  .full{
-    grid-column:auto;
-  }
+if(error)
+alert(error.message);
+else
+setApps(data||[]);
+
 }
 
-@media(max-width:420px){
-  .stats{
-    grid-template-columns:1fr;
-  }
+useEffect(()=>{
+load();
+},[]);
 
-  .stat{
-    min-height:auto;
-  }
+const counts={
+total:apps.length,
+received:apps.filter(x=>x.status==='received').length,
+processing:apps.filter(x=>x.status==='processing').length,
+completed:apps.filter(x=>x.status==='completed').length,
+rejected:apps.filter(x=>x.status==='rejected').length
+};
+const now=new Date();
+
+const todayIncome=apps
+  .filter(a=>{
+    const d=new Date(a.created_at);
+    return d.toDateString()===now.toDateString();
+  })
+  .reduce((sum,a)=>sum+(Number(a.paid_paise)||0),0)/100;
+
+const monthIncome=apps
+  .filter(a=>{
+    const d=new Date(a.created_at);
+    return d.getMonth()===now.getMonth() &&
+           d.getFullYear()===now.getFullYear();
+  })
+  .reduce((sum,a)=>sum+(Number(a.paid_paise)||0),0)/100;
+
+const totalPaid=apps
+  .reduce((sum,a)=>sum+(Number(a.paid_paise)||0),0)/100;
+
+const totalBalance=apps
+  .reduce((sum,a)=>sum+
+    ((Number(a.fee_paise)||0)-(Number(a.paid_paise)||0)),0)/100;
+
+return <>
+<header>
+<b>JOY ONLINE SERVICES</b>
+<button onClick={()=>supabase.auth.signOut()}>
+Logout
+</button>
+</header>
+
+<nav>
+{[
+['dashboard','Dashboard'],
+['applications','Applications'],
+['new','New Application']
+].map(x=>
+<button
+className={tab===x[0]?'active':''}
+onClick={()=>setTab(x[0])}
+key={x[0]}>
+{x[1]}
+</button>
+)}
+</nav>
+
+<main>
+
+{tab==='dashboard'&&<>
+<div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+  <h2>Dashboard</h2>
+  <button onClick={load}>🔄 Refresh</button>
+</div>
+<p>
+  {new Date().getHours() < 12
+    ? 'Good Morning'
+    : new Date().getHours() < 17
+    ? 'Good Afternoon'
+    : 'Good Evening'}
+  , {profile.full_name || 'Admin'} 👋
+</p>
+  
+<div style={{marginBottom:'15px'}}>
+  📅 Today: {new Date().toLocaleDateString('en-IN')}
+</div>
+  
+<div className="stats">
+
+{Object.entries({
+Total:counts.total,
+Received:counts.received,
+Processing:counts.processing,
+Completed:counts.completed,
+Rejected:counts.rejected
+}).map(([k,v])=>
+<div className="stat" key={k}>
+<small>{k}</small>
+<strong>{v}</strong>
+</div>
+)}
+
+</div>
+<div className="stats">
+
+<div className="stat">
+<small>Today Applications</small>
+<strong>
+{apps.filter(a =>
+  a.created_at &&
+  new Date(a.created_at).toDateString() === new Date().toDateString()
+).length}
+</strong>
+</div>
+
+<div className="stat">
+<small>Today Pending</small>
+<strong>
+{apps.filter(a =>
+  a.created_at &&
+  new Date(a.created_at).toDateString() === new Date().toDateString() &&
+  (a.status === 'received' || a.status === 'processing')
+).length}
+</strong>
+</div>
+
+<div className="stat">
+<small>Today Completed</small>
+<strong>
+{apps.filter(a =>
+  a.created_at &&
+  new Date(a.created_at).toDateString() === new Date().toDateString() &&
+  a.status === 'completed'
+).length}
+</strong>
+</div>
+
+<div className="stat">
+<small>Today Collection</small>
+<strong>
+₹{(
+  apps
+    .filter(a =>
+      a.created_at &&
+      new Date(a.created_at).toDateString() === new Date().toDateString()
+    )
+    .reduce((sum, a) => sum + (Number(a.paid_paise) || 0), 0) / 100
+).toFixed(2)}
+</strong>
+</div>
+
+</div>
+<div className="stats">
+  <div className="stat">
+    <small>Today Income</small>
+    <strong>₹{todayIncome.toFixed(2)}</strong>
+  </div>
+
+  <div className="stat">
+    <small>Monthly Income</small>
+    <strong>₹{monthIncome.toFixed(2)}</strong>
+  </div>
+  <div className="stat">
+  <small>Total Paid</small>
+  <strong>
+    ₹{(apps.reduce((sum, a) => sum + (Number(a.paid_paise) || 0), 0) / 100).toFixed(2)}
+  </strong>
+</div>
+
+<div className="stat">
+  <small>Total Balance</small>
+  <strong>
+    ₹{(apps.reduce((sum, a) => sum + (Number(a.fee_paise) || 0), 0) / 100 -
+        apps.reduce((sum, a) => sum + (Number(a.paid_paise) || 0), 0) / 100).toFixed(2)}
+  </strong>
+</div>
+</div>
+
+<div style={{
+  display:'grid',
+  gridTemplateColumns:'repeat(4,minmax(0,1fr))',
+  gap:'14px',
+  margin:'22px 0'
+}}>
+
+{[
+  ['🪪','Aadhaar Card'],
+  ['💳','PAN Card'],
+  ['🗳️','Voter Card'],
+  ['🚘','Driving Licence']
+].map(([icon,name])=>(
+  <div
+    key={name}
+    className="card"
+    style={{
+      textAlign:'center',
+      cursor:'pointer',
+      padding:'22px 12px',
+      transition:'transform .15s ease'
+    }}
+    onClick={()=>setTab('new')}
+  >
+    <div style={{
+      fontSize:'46px',
+      marginBottom:'10px'
+    }}>
+      {icon}
+    </div>
+
+    <strong style={{
+      fontSize:'16px',
+      color:'#14213d'
+    }}>
+      {name}
+    </strong>
+  </div>
+))}
+
+</div>
+  <div className="appointment-box">
+<h3>📅 Appointments ({appointments.length})</h3>
+  <p>Manage today's appointments</p>
+<button onClick={() => setTab('appointments')}>
+  View Appointments
+  </button>
+</div>
+
+</>}
+
+{tab==='applications'&&
+<Applications
+apps={apps}
+refresh={load}
+select={setSelected}
+/>
 }
+
+{tab==='appointments' && (
+  <div className="row">
+    <h2>📅 Appointments</h2>
+
+    <div className="card">
+      <h3>Today's Appointments</h3>
+
+{appointments.length === 0 ? (
+  <p>No appointments added yet.</p>
+) : (
+  <div className="appointment-list">
+    {appointments.map((a) => (
+      <div className="card" key={a.id} style={{marginTop:'15px'}}>
+        <h3>{a.customer_name}</h3>
+
+        <p><b>Mobile:</b> {a.mobile}</p>
+        <p><b>Service:</b> {a.service}</p>
+        <p><b>Date:</b> {a.appointment_date}</p>
+        <p><b>Time:</b> {a.appointment_time}</p>
+
+        {a.notes && (
+          <p><b>Notes:</b> {a.notes}</p>
+        )}
+      </div>
+    ))}
+  </div>
+)}
+      <button
+  className="primary"
+  onClick={() => setTab('newAppointment')}
+>
+  + New Appointment
+</button>
+
+      <button
+        onClick={() => setTab('dashboard')}
+      >
+        Back to Dashboard
+      </button>
+    </div>
+  </div>
+)}
+  {tab === 'newAppointment' && (
+  <div className="row">
+    <h2>📅 New Appointment</h2>
+
+    <div className="card">
+      <h3>Appointment Details</h3>
+
+      <label>Customer Name</label>
+      <input
+  type="text"
+  placeholder="Enter customer name"
+  value={appointment.customer_name}
+  onChange={e =>
+    setAppointment({...appointment, customer_name:e.target.value})
+  }
+/>
+
+      <label>Mobile Number</label>
+      <input
+  type="tel"
+  placeholder="Enter mobile number"
+  value={appointment.mobile}
+  onChange={e =>
+    setAppointment({...appointment, mobile:e.target.value})
+  }
+/>
+
+      <label>Service</label>
+      <input
+  type="text"
+  placeholder="Enter service"
+  value={appointment.service}
+  onChange={e =>
+    setAppointment({...appointment, service:e.target.value})
+  }
+/>
+
+      <label>Appointment Date</label>
+<input
+  type="date"
+  value={appointment.appointment_date}
+  onChange={e =>
+    setAppointment({
+      ...appointment,
+      appointment_date: e.target.value
+    })
+  }
+/>
+      <label>Appointment Time</label>
+<input
+  type="time"
+  value={appointment.appointment_time}
+  onChange={e =>
+    setAppointment({
+      ...appointment,
+      appointment_time: e.target.value
+    })
+  }
+/>
+      <label>Notes</label>
+      <textarea
+  rows="4"
+  placeholder="Enter notes"
+  value={appointment.notes}
+  onChange={e =>
+    setAppointment({
+      ...appointment,
+      notes: e.target.value
+    })
+  }
+/>
+
+      <br />
+
+      <button
+  className="primary"
+  onClick={saveAppointment}
+  disabled={appointmentBusy}
+>
+  {appointmentBusy ? 'Saving...' : 'Save Appointment'}
+</button>
+
+      <button onClick={() => setTab('appointments')}>
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
+  {tab==='new'&&
+<New
+userId={user.id}
+done={async()=>{
+await load();
+setTab('applications');
+}}
+/>
+}
+
+</main>
+
+{selected&&
+<Drawer
+app={selected}
+close={()=>setSelected(null)}
+refresh={load}
+/>
+}
+
+</>;
+}
+
+
+function Applications({apps,refresh,select}){
+  const [search,setSearch]=useState('');
+  const [statusFilter,setStatusFilter]=useState('All');
+  const [dateFilter,setDateFilter]=useState('All');
+const [customDate,setCustomDate]=useState('');
+
+  const filteredApps=apps.filter(a=>{
+  const appDate=a.created_at ? new Date(a.created_at) : null;
+  const today=new Date();
+
+  const sameDay=(d1,d2)=>
+    d1 && d2 && d1.toDateString()===d2.toDateString();
+
+  const dateMatch =
+    dateFilter==='All' ||
+    (dateFilter==='Today' && sameDay(appDate,today)) ||
+    (dateFilter==='Yesterday' &&
+      sameDay(
+        appDate,
+        new Date(today.getFullYear(),today.getMonth(),today.getDate()-1)
+      )
+    ) ||
+    (dateFilter==='This Month' &&
+      appDate &&
+      appDate.getMonth()===today.getMonth() &&
+      appDate.getFullYear()===today.getFullYear()
+    ) ||
+    (dateFilter==='Custom' &&
+      customDate &&
+      appDate &&
+      appDate.toISOString().slice(0,10)===customDate
+    );
+
+  return (
+    (statusFilter==='All' || a.status===statusFilter) &&
+    dateMatch &&
+    (
+      (a.customer_name||'').toLowerCase().includes(search.toLowerCase()) ||
+      (a.mobile||'').includes(search) ||
+      (a.application_no||'').toLowerCase().includes(search.toLowerCase())
+    )
+  );
+});
+
+  return <>
+    <div className="row">
+      <h2>Applications</h2>
+      <div className="row">
+  <button onClick={()=>setStatusFilter('All')}>All</button>
+  <button onClick={()=>setStatusFilter('pending')}>Pending</button>
+  <button onClick={()=>setStatusFilter('processing')}>Processing</button>
+  <button onClick={()=>setStatusFilter('completed')}>Completed</button>
+  <button onClick={()=>setStatusFilter('cancelled')}>Cancelled</button>
+  <button onClick={()=>setDateFilter('All')}>All Dates</button>
+<button onClick={()=>setDateFilter('Today')}>Today</button>
+<button onClick={()=>setDateFilter('Yesterday')}>Yesterday</button>
+<button onClick={()=>setDateFilter('This Month')}>This Month</button>
+<button onClick={()=>setDateFilter('Custom')}>Custom Date</button>
+
+{dateFilter==='Custom' && (
+  <input
+    type="date"
+    value={customDate}
+    onChange={e=>setCustomDate(e.target.value)}
+  />
+)}
+</div>
+
+      <input
+        type="text"
+        placeholder="Search customer, mobile or application no..."
+        value={search}
+        onChange={e=>setSearch(e.target.value)}
+      />
+
+      <button onClick={refresh}>Refresh</button>
+    </div>
+
+    <div className="card scroll">
+      <table>
+
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Customer</th>
+            <th>Mobile</th>
+            <th>Service</th>
+            <th>Notes</th>
+            <th>Total</th>
+            <th>Paid</th>
+            <th>Balance</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          {filteredApps.map(a=>
+            <tr key={a.id}>
+
+              <td onClick={()=>select(a)}>
+                {a.application_no}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                {a.customer_name}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                {a.mobile}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                {a.service}
+              </td>
+
+              <td onClick={()=>select(a)}>
+              {a.notes || '-'}
+              </td>
+              
+              <td onClick={()=>select(a)}>
+                ₹{((a.fee_paise||0)/100).toFixed(2)}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                ₹{((a.paid_paise||0)/100).toFixed(2)}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                ₹{(((a.fee_paise||0)-(a.paid_paise||0))/100).toFixed(2)}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                <span className={'status '+a.status}>
+                  {a.status}
+                </span>
+              </td>
+
+              <td>
+                <button
+                  onClick={async e=>{
+                    e.stopPropagation();
+
+                    if(!window.confirm('Delete this application?'))
+                      return;
+
+                    const {error}=await supabase
+                      .from('applications')
+                      .delete()
+                      .eq('id',a.id);
+
+                    if(error){
+                      alert(error.message);
+                    }else{
+                      alert('Application deleted');
+                      refresh();
+                    }
+                  }}
+                >
+                  🗑️ Delete
+                </button>
+              </td>
+
+            </tr>
+          )}
+
+          {!filteredApps.length &&
+            <tr>
+              <td colSpan="9">
+                No applications found.
+              </td>
+            </tr>
+          }
+
+        </tbody>
+      </table>
+    </div>
+  </>;
+}
+function New({userId,done}){
+
+const[f,setF]=useState({
+application_no:'',
+customer_name:'',
+mobile:'',
+service:'',
+address:'',
+notes:'',
+fee:'',
+});
+
+const[busy,setBusy]=useState(false);
+
+function ch(e){
+setF({
+...f,
+[e.target.name]:e.target.value
+});
+}
+
+async function save(e){
+
+e.preventDefault();
+setBusy(true);
+
+const{error}=await supabase
+.from('applications')
+.insert({
+application_no: f.application_no || `JOY-${Date.now().toString().slice(-6)}`,
+customer_id:userId,
+customer_name:f.customer_name,
+mobile:f.mobile,
+service:f.service,
+address:f.address||null,
+notes:f.notes||null,
+fee_paise:Math.round((Number(f.fee)||0)*100),
+payment_status:'unpaid',
+status:'received'
+});
+
+if(error){
+
+alert(error.message);
+
+}else{
+
+alert('Application created');
+await done();
+
+}
+
+setBusy(false);
+}
+
+return <>
+<h2>New Application</h2>
+
+<form className="card form" onSubmit={save}>
+
+<div>
+<label>Customer name</label>
+<input
+name="customer_name"
+value={f.customer_name}
+onChange={ch}
+required
+/>
+</div>
+
+<div>
+<label>Mobile</label>
+<input
+name="mobile"
+value={f.mobile}
+onChange={ch}
+required
+/>
+</div>
+
+<div>
+<label>Service</label>
+<select
+name="service"
+value={f.service}
+onChange={ch}
+required
+>
+<option value="">Select Service</option>
+<option value="Aadhaar Card">Aadhaar Card</option>
+<option value="PAN Card">PAN Card</option>
+<option value="Voter Card">Voter Card</option>
+<option value="Passport">Passport</option>
+<option value="Ration Card">Ration Card</option>
+<option value="Others">Others</option>
+</select>
+</div>
+
+<div>
+<label>Fee (₹)</label>
+<input
+name="fee"
+value={f.fee}
+onChange={ch}
+/>
+</div>
+<div className="full">
+  <label>Important Notes</label>
+  <textarea
+    name="notes"
+    rows="4"
+    placeholder="Enter important notes"
+    value={f.notes}
+    onChange={ch}
+  />
+</div>
+<div className="full">
+<label>Address</label>
+<textarea
+name="address"
+value={f.address}
+onChange={ch}
+/>
+</div>
+
+<div className="full">
+
+<button className="primary" disabled={busy}>
+{busy?'Creating…':'Create Application'}
+</button>
+
+</div>
+
+</form>
+</>;
+}
+
+
+function Drawer({app,close,refresh}){
+
+const[status,setStatus]=useState(app.status);
+const[docs,setDocs]=useState([]);
+const [documentType,setDocumentType]=useState('Other');
+const[paid,setPaid]=useState((app.paid_paise||0)/100);
+const[uploading,setUploading]=useState(false);
+async function loadDocs(){
+
+const{data}=await supabase
+.from('documents')
+.select('*')
+.eq('application_id',app.id)
+.order('created_at',{ascending:false});
+
+setDocs(data||[]);
+
+}
+
+useEffect(()=>{
+loadDocs();
+},[app.id]);
+
+
+async function save(){
+
+const{error}=await supabase
+.from('applications')
+.update({
+status,
+paid_paise:Math.round((Number(paid)||0)*100),
+updated_at:new Date().toISOString()
+})
+.eq('id',app.id);
+
+if(error)
+alert(error.message);
+else{
+alert('Status updated');
+refresh();
+}
+
+}
+
+
+async function upload(file, documentType){
+
+if(!file)
+return;
+
+if(file.size>10*1024*1024)
+return alert('File must be 10 MB or smaller.');
+
+setUploading(true);
+
+const safe=file.name.replace(
+/[^a-zA-Z0-9._-]/g,
+'_'
+);
+
+const path=
+`${app.id}/${Date.now()}-${safe}`;
+
+let r=await supabase.storage
+.from(BUCKET)
+.upload(path,file,{
+contentType:file.type
+});
+
+if(r.error){
+
+alert(r.error.message);
+
+}else{
+
+r=await supabase
+.from('documents')
+.insert({
+  application_id:app.id,
+  path,
+  name:file.name,
+  size:file.size,
+  document_type:documentType
+});
+
+if(r.error)
+alert(r.error.message);
+else
+await loadDocs();
+
+}
+
+setUploading(false);
+
+}
+
+
+async function view(d){
+
+const{data,error}=await supabase.storage
+.from(BUCKET)
+.createSignedUrl(d.path,120);
+
+if(error)
+alert(error.message);
+else
+window.open(data.signedUrl,'_blank');
+
+}
+
+
+return <div className="backdrop" onClick={close}>
+
+<aside onClick={e=>e.stopPropagation()}>
+
+<div className="row">
+
+<div>
+<b>{app.application_no}</b>
+<div>{app.customer_name}</div>
+</div>
+
+<button onClick={close}>✕</button>
+
+</div>
+
+<hr/>
+
+<p>
+<b>Mobile:</b> {app.mobile}
+</p>
+
+<button
+  className="primary"
+  onClick={()=>{
+const phone=(app.mobile||'').replace(/\D/g,'');
+    window.open(`https://wa.me/91${phone}`,'_blank');
+  }}
+>
+  WhatsApp Customer
+</button>
+
+<button
+  className="primary"
+  onClick={() => window.print()}
+>
+  Print Receipt
+</button>
+
+<p>
+<b>Service:</b> {app.service}
+</p>
+
+<p>
+<b>Address:</b> {app.address || 'Not provided'}
+</p>
+
+<p>
+<b>Application Date:</b> {app.created_at ? new Date(app.created_at).toLocaleDateString('en-IN') : 'Not available'}
+</p>
+
+<p>
+<b>Payment:</b> {app.payment_status}
+</p>
+<p>
+<b>Total Amount:</b> ₹{((app.fee_paise||0)/100).toFixed(2)}
+</p>
+
+<label>
+<b>Paid Amount</b>
+</label>
+
+<input
+type="number"
+min="0"
+step="0.01"
+value={paid}
+onChange={e=>setPaid(e.target.value)}
+/>
+
+<p>
+<b>Balance:</b> ₹{(
+((app.fee_paise||0)/100) - (Number(paid)||0)
+).toFixed(2)}
+</p>
+
+<h3>Status</h3>
+
+<div className="row">
+
+<select
+value={status}
+onChange={e=>setStatus(e.target.value)}
+>
+
+<option>received</option>
+<option>processing</option>
+<option>completed</option>
+<option>rejected</option>
+
+</select>
+
+<button className="primary" onClick={save}>
+Save
+</button>
+
+</div>
+
+<h3>Private Documents</h3>
+  <label>Document Type</label>
+
+<select
+  value={documentType}
+  onChange={(e)=>setDocumentType(e.target.value)}
+>
+  <option value="Aadhaar">Aadhaar</option>
+  <option value="PAN">PAN</option>
+  <option value="Voter ID">Voter ID</option>
+  <option value="Photo">Photo</option>
+  <option value="Signature">Signature</option>
+  <option value="Other">Other</option>
+</select>
+
+<input
+type="file"
+accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+disabled={uploading}
+onChange={e=>upload(e.target.files?.[0])}
+/>
+
+<p>
+PDF/JPG/PNG, maximum 10 MB.
+</p>
+
+{docs.map(d=>
+<div className="doc" key={d.id}>
+
+<span>{d.name}</span>
+
+<button onClick={()=>view(d)}>
+View securely
+</button>
+
+</div>
+)}
+
+</aside>
+
+</div>;
+}
+
+
+createRoot(
+document.getElementById('root')
+).render(<App/>);
