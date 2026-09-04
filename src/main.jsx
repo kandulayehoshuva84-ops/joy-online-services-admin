@@ -305,6 +305,7 @@ function App(){
 function Admin({user,profile}){
 
 const[tab,setTab]=useState('dashboard');
+const [selectedService,setSelectedService]=useState(null);
 const[apps,setApps]=useState([]);
 const[selected,setSelected]=useState(null);
 const[appointments,setAppointments]=useState([]);
@@ -564,38 +565,164 @@ Rejected:counts.rejected
   margin:'22px 0'
 }}>
 
-{[
-  ['🪪','Aadhaar Card'],
-  ['💳','PAN Card'],
-  ['🗳️','Voter Card'],
-  ['🚘','Driving Licence']
-].map(([icon,name])=>(
-  <div
-    key={name}
-    className="card"
-    style={{
-      textAlign:'center',
-      cursor:'pointer',
-      padding:'22px 12px',
-      transition:'transform .15s ease'
-    }}
-    onClick={()=>setTab('new')}
-  >
-    <div style={{
-      fontSize:'46px',
-      marginBottom:'10px'
-    }}>
-      {icon}
-    </div>
+{selectedService ? (
+  <div style={{margin:'22px 0'}}>
+    <button
+      onClick={()=>setSelectedService(null)}
+      style={{
+        border:'none',
+        background:'#111827',
+        color:'#fff',
+        padding:'10px 18px',
+        borderRadius:'8px',
+        cursor:'pointer',
+        marginBottom:'18px',
+        fontWeight:'600'
+      }}
+    >
+      ← Back to Services
+    </button>
 
-    <strong style={{
-      fontSize:'16px',
-      color:'#14213d'
+    <h2 style={{
+      margin:'0 0 18px',
+      color:'#111827',
+      fontSize:'22px'
     }}>
-      {name}
-    </strong>
+      {selectedService.name}
+    </h2>
+
+    <div style={{
+      display:'grid',
+      gridTemplateColumns:'repeat(3,minmax(0,1fr))',
+      gap:'14px'
+    }}>
+      {selectedService.subServices.map((service)=>(
+        <div
+          key={service.name}
+          className="card"
+          onClick={()=>window.open(service.url,'_blank','noopener,noreferrer')}
+          style={{
+            cursor:'pointer',
+            padding:'20px',
+            textAlign:'center'
+          }}
+        >
+          <div style={{
+            fontSize:'17px',
+            fontWeight:'700',
+            color:'#14213d',
+            marginBottom:'8px'
+          }}>
+            {service.name}
+          </div>
+
+          <div style={{
+            fontSize:'13px',
+            color:'#64748b'
+          }}>
+            Open Service →
+          </div>
+        </div>
+      ))}
+    </div>
   </div>
-))}
+) : (
+  <div style={{
+    display:'grid',
+    gridTemplateColumns:'repeat(4,minmax(0,1fr))',
+    gap:'14px',
+    margin:'22px 0'
+  }}>
+    {[
+      {
+        name:'Aadhaar Card',
+        image:'/images/adhar-logo.webp',
+        subServices:[
+          {name:'Aadhaar Update',url:'https://myaadhaar.uidai.gov.in/'},
+          {name:'Address Update',url:'https://myaadhaar.uidai.gov.in/'},
+          {name:'Mobile Update',url:'https://myaadhaar.uidai.gov.in/'},
+          {name:'Name Correction',url:'https://myaadhaar.uidai.gov.in/'},
+          {name:'DOB Correction',url:'https://myaadhaar.uidai.gov.in/'},
+          {name:'Download Aadhaar',url:'https://myaadhaar.uidai.gov.in/'}
+        ]
+      },
+      {
+        name:'PAN Card',
+        image:'/images/pan-card.webp',
+        subServices:[
+          {name:'New PAN Application',url:'https://panmitra.com/portallogin/login'},
+          {name:'PAN Correction',url:'https://panmitra.com/portallogin/login'},
+          {name:'PAN Download',url:'https://panmitra.com/portallogin/login'}
+        ]
+      },
+      {
+        name:'Voter Card',
+        image:'/images/voter-card.webp',
+        subServices:[
+          {name:'New Voter Registration',url:'https://voters.eci.gov.in/'},
+          {name:'Voter Correction',url:'https://voters.eci.gov.in/'},
+          {name:'Download e-EPIC',url:'https://voters.eci.gov.in/'}
+        ]
+      },
+      {
+        name:'Driving Licence',
+        image:'/images/driving-licence.webp',
+        subServices:[
+          {name:'Learner Licence',url:'https://sarathi.parivahan.gov.in/sarathiservice/stateSelection.do'},
+          {name:'DL Renewal',url:'https://sarathi.parivahan.gov.in/sarathiservice/stateSelection.do'},
+          {name:'DL Services',url:'https://sarathi.parivahan.gov.in/sarathiservice/stateSelection.do'}
+        ]
+      }
+    ].map((service)=>(
+      <div
+        key={service.name}
+        className="card"
+        onClick={()=>setSelectedService(service)}
+        style={{
+          textAlign:'center',
+          cursor:'pointer',
+          padding:'14px',
+          overflow:'hidden'
+        }}
+      >
+        <div style={{
+          width:'100%',
+          height:'150px',
+          display:'flex',
+          alignItems:'center',
+          justifyContent:'center',
+          marginBottom:'12px'
+        }}>
+          <img
+            src={service.image}
+            alt={service.name}
+            style={{
+              maxWidth:'100%',
+              maxHeight:'150px',
+              objectFit:'contain',
+              display:'block'
+            }}
+          />
+        </div>
+
+        <strong style={{
+          fontSize:'16px',
+          color:'#14213d'
+        }}>
+          {service.name}
+        </strong>
+
+        <div style={{
+          marginTop:'7px',
+          fontSize:'13px',
+          color:'#64748b'
+        }}>
+          Click to View Services →
+        </div>
+      </div>
+    ))}
+  </div>
+)}
 
 </div>
   <div className="appointment-box">
