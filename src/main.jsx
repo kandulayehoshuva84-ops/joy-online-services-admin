@@ -435,7 +435,8 @@ return <div className="app-shell">
     ['dashboard','⌂','Dashboard'],
     ['appointments','▣','Appointments'],
     ['applications','♙','Applications'],
-    ['new','＋','New Application']
+    ['new','＋','New Application'],
+    ['adharDictionary','▣','Adhar Dictionary']
   ].map(([id,icon,label])=>
     <button className={tab===id?'active':''} onClick={()=>setTab(id)} key={id}>
       <span className="nav-icon">{icon}</span><span>{label}</span>
@@ -651,6 +652,115 @@ refresh={load}
 select={setSelected}
 />
 }
+
+{tab==='adharDictionary' && (
+  <section className="adhar-book">
+    <div className="adhar-book-head">
+      <button onClick={()=>setTab('dashboard')}>← Back to Dashboard</button>
+      <div>
+        <h2>📖 Adhar Dictionary</h2>
+        <p>Aadhaar problems &amp; practical solutions</p>
+      </div>
+    </div>
+
+    <div className="adhar-book-layout">
+      <aside className="adhar-book-index">
+        <h3>Contents</h3>
+        <button onClick={()=>document.getElementById('aadhaar-enrolment')?.scrollIntoView({behavior:'smooth'})}>1. Enrollment Problems</button>
+        <button onClick={()=>document.getElementById('aadhaar-update')?.scrollIntoView({behavior:'smooth'})}>2. Update Problems</button>
+        <button onClick={()=>document.getElementById('aadhaar-mobile')?.scrollIntoView({behavior:'smooth'})}>3. Mobile Problems</button>
+        <button onClick={()=>document.getElementById('aadhaar-dob-name')?.scrollIntoView({behavior:'smooth'})}>4. Name / DOB Problems</button>
+        <button onClick={()=>document.getElementById('aadhaar-address')?.scrollIntoView({behavior:'smooth'})}>5. Address Problems</button>
+        <button onClick={()=>document.getElementById('aadhaar-download')?.scrollIntoView({behavior:'smooth'})}>6. Download / PVC</button>
+        <button onClick={()=>document.getElementById('aadhaar-auth')?.scrollIntoView({behavior:'smooth'})}>7. OTP / Authentication</button>
+        <button onClick={()=>document.getElementById('aadhaar-escalation')?.scrollIntoView({behavior:'smooth'})}>8. When to Escalate</button>
+      </aside>
+
+      <div className="adhar-book-pages">
+        <div className="adhar-book-cover">
+          <div className="book-icon">📕</div>
+          <div>
+            <h1>AADHAAR PROBLEM SOLVING</h1>
+            <p>JOY ONLINE SERVICES — Adhar Dictionary</p>
+            <span>Quick reference guide for common Aadhaar service issues</span>
+          </div>
+        </div>
+
+        <article id="aadhaar-enrolment" className="adhar-book-section">
+          <h3>1. Aadhaar Enrollment Problems</h3>
+          <div className="solution-grid">
+            <div><b>Enrollment not completed</b><p>Check whether the enrollment was successfully submitted. Keep the acknowledgement / EID safely for status checking.</p></div>
+            <div><b>EID lost</b><p>Use the official UIDAI recovery/status options where available, or help the customer recover the enrolment details using the registered information.</p></div>
+            <div><b>Enrollment rejected</b><p>Check the rejection reason first. Correct the required information or documents and follow the official re-enrollment process.</p></div>
+          </div>
+        </article>
+
+        <article id="aadhaar-update" className="adhar-book-section">
+          <h3>2. Aadhaar Update Problems</h3>
+          <div className="solution-grid">
+            <div><b>Update not reflecting</b><p>Check update status using the acknowledgement details. If it is still under process, wait for processing before submitting another request.</p></div>
+            <div><b>Update rejected</b><p>Verify that the submitted information and supporting document match the requested update. Re-submit through an authorised UIDAI channel when required.</p></div>
+            <div><b>Document not accepted</b><p>Use an accepted Proof of Identity / Proof of Address document as applicable and ensure the document is clear and valid.</p></div>
+          </div>
+        </article>
+
+        <article id="aadhaar-mobile" className="adhar-book-section">
+          <h3>3. Mobile Number Problems</h3>
+          <div className="solution-grid">
+            <div><b>Mobile number not linked</b><p>Aadhaar OTP services require a registered mobile number. If the number is not linked or needs changing, use the authorised Aadhaar update process.</p></div>
+            <div><b>OTP not received</b><p>Check the registered mobile number, network, SMS availability and retry after a short interval. Never ask the customer to share an OTP with anyone.</p></div>
+          </div>
+        </article>
+
+        <article id="aadhaar-dob-name" className="adhar-book-section">
+          <h3>4. Name / Date of Birth Problems</h3>
+          <div className="solution-grid">
+            <div><b>Name correction</b><p>Verify the desired spelling against the supporting document and submit the correction through an authorised Aadhaar channel.</p></div>
+            <div><b>Date of Birth correction</b><p>Check the supporting DOB document and eligibility for the requested correction before submitting.</p></div>
+            <div><b>Mismatch in documents</b><p>First identify the exact mismatch. Use consistent information in the supporting document and application.</p></div>
+          </div>
+        </article>
+
+        <article id="aadhaar-address" className="adhar-book-section">
+          <h3>5. Address Problems</h3>
+          <div className="solution-grid">
+            <div><b>Address change</b><p>Use an accepted Proof of Address and enter the address carefully. Review spelling, PIN code and locality before submission.</p></div>
+            <div><b>Address update rejected</b><p>Check whether the submitted address proof is acceptable and whether the address entered matches the supporting document.</p></div>
+          </div>
+        </article>
+
+        <article id="aadhaar-download" className="adhar-book-section">
+          <h3>6. Aadhaar Download / PVC Problems</h3>
+          <div className="solution-grid">
+            <div><b>e-Aadhaar download issue</b><p>Use the official UIDAI portal and verify the Aadhaar details / OTP requirements before downloading.</p></div>
+            <div><b>PVC card issue</b><p>Check the official PVC order/status options and keep the request details for future reference.</p></div>
+            <div><b>Aadhaar print needed</b><p>After a successful download, print only the required copy and handle the customer's Aadhaar information securely.</p></div>
+          </div>
+        </article>
+
+        <article id="aadhaar-auth" className="adhar-book-section">
+          <h3>7. OTP / Authentication Problems</h3>
+          <div className="solution-grid">
+            <div><b>Authentication failed</b><p>Check the entered Aadhaar details, OTP or biometric conditions and retry through the official service.</p></div>
+            <div><b>Biometric authentication failed</b><p>Clean the fingers / scanner area and retry as appropriate. Repeated failures should be handled through the authorised Aadhaar support/update route.</p></div>
+          </div>
+        </article>
+
+        <article id="aadhaar-escalation" className="adhar-book-section">
+          <h3>8. When to Escalate</h3>
+          <div className="adhar-warning">
+            <b>Important:</b> Never guess, alter, or bypass UIDAI verification. For cases involving identity disputes, repeated rejection, locked/blocked access, or issues that cannot be resolved through the official process, guide the customer to the official UIDAI support / authorised centre.
+          </div>
+        </article>
+
+        <div className="adhar-book-footer">
+          <b>JOY ONLINE SERVICES</b>
+          <span>AADHAAR PROBLEM SOLVING • TELUGU SAMASYA PARISHKARAM</span>
+        </div>
+      </div>
+    </div>
+  </section>
+)}
 
 {tab==='appointments' && (
   <div className="row">
