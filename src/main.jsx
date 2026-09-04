@@ -1,289 +1,1444 @@
-*{box-sizing:border-box}
-:root{--navy:#111b3a;--navy2:#172554;--page:#f4f7fb;--muted:#64748b;--border:#e5eaf2;--white:#fff;--accent:#2563eb}
-html,body,#root{min-height:100%;margin:0}
-body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--page);color:#0f172a}
-button,input,textarea,select{font:inherit}
-button{border:0;border-radius:10px;padding:10px 14px;background:#e9edf4;color:#111827;cursor:pointer;transition:.15s ease}
-button:hover{filter:brightness(.98);transform:translateY(-1px)}
-button:disabled{opacity:.65;cursor:not-allowed;transform:none}
-button.primary{background:var(--navy);color:#fff}
-.center{min-height:100vh;display:grid;place-items:center}
-.login{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--navy)}
-.loginbox{background:#fff;padding:30px;border-radius:20px;width:min(420px,100%);box-shadow:0 18px 50px #00000026}
-.logo{width:55px;height:55px;background:var(--navy);color:#fff;border-radius:15px;display:grid;place-items:center;font-size:28px;font-weight:800}
-.loginbox h1{font-size:22px;margin:16px 0 6px}.loginbox p{color:var(--muted)}
-.loginbox label,.form label{display:block;font-weight:700;font-size:13px;margin:12px 0 5px}
-.loginbox input,.form input,.form textarea,select{width:100%;padding:11px;border:1px solid #d1d5db;border-radius:10px;background:#fff;outline:none}
-.loginbox input:focus,.form input:focus,.form textarea:focus,select:focus{border-color:#94a3b8;box-shadow:0 0 0 3px #64748b18}
-.loginbox button{width:100%;margin-top:16px}
-.err{background:#fee2e2;color:#991b1b;padding:10px;border-radius:9px;margin-top:10px}
-.success{background:#dcfce7;color:#166534;padding:10px;border-radius:9px;margin-top:10px}
-.linkbutton{background:transparent;color:#2563eb;padding:8px}.secondary{background:#eef0f3}
+import React,{useEffect,useState}from'react';
+import{createRoot}from'react-dom/client';
+import{supabase}from'./supabase';
+import'./styles.css';
 
-/* JOY DASHBOARD SHELL */
-.app-shell{min-height:100vh;display:flex;background:var(--page)}
-.sidebar{width:270px;min-width:270px;background:#fff;border-right:1px solid #e7ebf2;display:flex;flex-direction:column;padding:24px 15px;position:sticky;top:0;height:100vh}
-.brand{padding:0 18px 28px}.brand-mark{font-size:42px;line-height:1;font-weight:900;letter-spacing:-2px;background:linear-gradient(90deg,#1769ff,#6d28d9);-webkit-background-clip:text;background-clip:text;color:transparent}
-.brand-sub{font-size:18px;font-weight:800;color:#172554;margin-top:6px;letter-spacing:.2px}
-.sidebar nav{background:transparent;border:0;padding:0;display:flex;flex-direction:column;gap:6px;overflow:visible}
-.sidebar nav button{width:100%;display:flex;align-items:center;gap:16px;background:transparent;color:#334155;padding:14px 18px;text-align:left;font-size:16px;font-weight:600;border-radius:13px}
-.sidebar nav button:hover{background:#f4f7ff;color:#1769ff}.sidebar nav button.active{background:#eef5ff;color:#1769ff}
-.nav-icon{width:18px;min-width:18px;text-align:center;font-size:14px;font-weight:800}
-.system-status{margin-top:auto;background:#f4f8ff;border-radius:16px;padding:17px 16px;display:flex;gap:10px;align-items:flex-start}
-.status-dot{width:12px;height:12px;border-radius:50%;background:#18b878;margin-top:4px;flex:none}
-.system-status strong{display:block;color:#0a9f68;font-size:14px}.system-status small{display:block;color:#64748b;font-size:11px;margin-top:5px}
-.app-content{flex:1;min-width:0}.app-content>header{height:76px;background:#fff;border-bottom:1px solid #e8edf4;padding:0 34px;display:flex;justify-content:flex-end;align-items:center}
-.topbar-right{display:flex;align-items:center;gap:24px}.date-card{display:flex;align-items:center;gap:10px;padding:10px 18px;border:1px solid #dbe7ff;background:#f7faff;border-radius:15px}
-.date-icon{font-size:25px;color:#1769ff}.date-card small{display:block;color:#1769ff;font-size:12px}.date-card strong{display:block;color:#173b75;font-size:15px;margin-top:2px}
-.admin-user{display:flex;align-items:center;gap:10px;color:#17213d}.admin-avatar{width:42px;height:42px;border-radius:50%;background:#4169e1;color:#fff;display:grid;place-items:center;font-size:18px;font-weight:700}
-.admin-user button{background:transparent;color:#64748b;padding:7px 8px}.mobile-brand{display:none}
-main{max-width:none;margin:0;padding:34px 42px 50px}main h2{font-size:28px;margin:8px 0 24px;color:#14213d}main h3{color:#14213d}main p{color:#526b8b}
-.row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 12px}
-.stat,.card{background:var(--white);border-radius:18px;padding:17px;box-shadow:0 5px 22px #0f172a0b;border:1px solid #edf0f5}.stat{min-height:96px}
-.stat small{display:block;color:#64748b;font-size:14px;margin-bottom:4px}.stat strong{font-size:30px;line-height:1.1;color:#111827}
-.appointment-box{background:#fff;border-radius:18px;padding:22px;margin-top:22px;box-shadow:0 5px 22px #0f172a0b;border:1px solid #edf0f5}
-.appointment-box h3{margin:0 0 8px}.appointment-box p{margin:0 0 14px;color:#64748b}
+const BUCKET='Documents';
 
-/* SERVICES */
-.services-section{margin-top:30px}.services-heading{display:flex;align-items:flex-end;justify-content:space-between;margin:0 4px 18px}
-.services-title{font-size:27px;font-weight:850;color:#14213d;display:flex;align-items:center;gap:12px}.services-title span{color:#1769ff;font-size:34px;line-height:1}
-.services-heading p{margin:4px 0 0 46px;color:#64748b;font-size:16px}.services-tag{font-size:13px;letter-spacing:2px;color:#7185a3;font-weight:800;padding-bottom:6px}
-.service-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.service-card{min-width:0;background:#fff;border:1px solid #edf0f5;border-radius:20px;padding:14px 14px 18px;text-align:center;cursor:pointer;box-shadow:0 6px 24px #0f172a0b;transition:.18s ease}
-.service-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px #0f172a16}
-.service-image-wrap{width:100%;height:230px;border-radius:15px;background:#f8fafc;display:flex;align-items:center;justify-content:center;margin-bottom:13px;overflow:hidden}
-.service-card:nth-child(1) .service-image-wrap{background:#fff7f7}.service-card:nth-child(2) .service-image-wrap{background:#f5f9ff}.service-card:nth-child(3) .service-image-wrap{background:#f3fbf5}.service-card:nth-child(4) .service-image-wrap{background:#fffaf0}
-.service-image-wrap img{width:92%;height:92%;object-fit:contain;display:block}.service-card>strong{font-size:22px;color:#14213d;display:block}
-.service-hint{margin-top:6px;color:#5f7899;font-size:16px}.service-arrow{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;margin:15px auto 0;background:#eaf1ff;color:#1769ff;font-size:27px;font-weight:800}
-.service-card:nth-child(1) .service-arrow{background:#ffe6e6;color:#e53935}.service-card:nth-child(3) .service-arrow{background:#dcfce7;color:#16a34a}.service-card:nth-child(4) .service-arrow{background:#fff0cc;color:#f59e0b}
-.service-detail{margin-top:8px}.back-service{background:#111827;color:#fff;padding:11px 18px;font-weight:700;margin-bottom:20px}
-.service-detail-heading h2{margin:0 0 3px;font-size:27px}.service-detail-heading p{margin:0 0 18px}.subservice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.subservice-card{background:#fff;border:1px solid #edf0f5;border-radius:16px;padding:24px;text-align:center;cursor:pointer;box-shadow:0 5px 20px #0f172a0a;transition:.18s ease}
-.subservice-card:hover{transform:translateY(-3px);box-shadow:0 10px 25px #0f172a14}.subservice-icon{width:46px;height:46px;border-radius:50%;background:#eaf1ff;color:#1769ff;display:grid;place-items:center;margin:0 auto 12px;font-size:24px;font-weight:800}
-.subservice-card strong{display:block;color:#14213d;font-size:17px}.subservice-card span{display:block;color:#64748b;font-size:13px;margin-top:7px}
+function Login(){
+const[email,setEmail]=useState('');
+const[password,setPassword]=useState('');
+const[err,setErr]=useState('');
+const[busy,setBusy]=useState(false);
+const[forgot,setForgot]=useState(false);
+const[msg,setMsg]=useState('');
 
-/* EXISTING TABLE / FORM / DRAWER */
-.scroll{overflow:auto;margin-top:12px}table{width:100%;min-width:700px;border-collapse:collapse;background:#fff}
-th,td{padding:13px;border-bottom:1px solid #eef0f3;text-align:left;white-space:nowrap}th{color:#64748b;font-size:13px;background:#f8fafc}tr{cursor:pointer}
-.status{padding:5px 9px;border-radius:999px;font-size:12px;font-weight:700;text-transform:capitalize}.received{background:#dbeafe;color:#1d4ed8}.processing{background:#fef3c7;color:#92400e}.completed{background:#dcfce7;color:#166534}.rejected{background:#fee2e2;color:#991b1b}.pending{background:#fef3c7;color:#92400e}.cancelled{background:#fee2e2;color:#991b1b}
-.form{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}.full{grid-column:1/-1}
-.backdrop{position:fixed;inset:0;background:#0008;z-index:20}.backdrop aside{background:#fff;position:absolute;right:0;top:0;height:100%;width:min(560px,100%);padding:20px;overflow:auto;box-shadow:-10px 0 35px #0002}
-.doc{display:flex;justify-content:space-between;gap:8px;border:1px solid #ddd;padding:10px;border-radius:9px;margin-top:8px}.doc span{overflow:hidden;text-overflow:ellipsis}
-@media(max-width:1200px){.sidebar{width:230px;min-width:230px}main{padding:28px 24px 45px}.service-image-wrap{height:190px}.service-card>strong{font-size:19px}}
-@media(max-width:900px){.sidebar{width:210px;min-width:210px}.stats{grid-template-columns:repeat(3,1fr)}.service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.service-image-wrap{height:220px}}
-@media(max-width:700px){.app-shell{display:block}.sidebar{width:100%;min-width:0;height:auto;position:static;padding:14px 12px}.brand{padding:4px 10px 12px}.brand-mark{font-size:34px}.brand-sub{font-size:14px}.sidebar nav{display:grid;grid-template-columns:repeat(2,1fr)}.sidebar nav button{padding:10px 12px;font-size:14px}.nav-icon{font-size:19px}.system-status{display:none}.app-content>header{height:auto;min-height:66px;padding:10px 14px;justify-content:space-between}.mobile-brand{display:block;font-weight:800;color:#172554;font-size:15px}.topbar-right{gap:8px}.date-card{display:none}.admin-user strong{display:none}.admin-user button{font-size:12px}main{padding:20px 12px 35px}main h2{font-size:24px}.stats{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr}.full{grid-column:auto}.services-heading{align-items:flex-start}.services-title{font-size:23px}.services-heading p{margin-left:0}.services-tag{display:none}.service-grid{grid-template-columns:1fr 1fr;gap:10px}.service-image-wrap{height:155px}.service-card{padding:9px 8px 13px;border-radius:16px}.service-card>strong{font-size:16px}.service-hint{font-size:12px}.service-arrow{width:38px;height:38px;font-size:21px;margin-top:10px}.subservice-grid{grid-template-columns:1fr}}
-@media(max-width:420px){.stats{grid-template-columns:1fr}.stat{min-height:auto}.service-grid{grid-template-columns:1fr}.service-image-wrap{height:210px}}
+async function login(e){
+e.preventDefault();
+setBusy(true);
+setErr('');
+const{error}=await supabase.auth.signInWithPassword({email,password});
+if(error)setErr(error.message);
+setBusy(false);
+}
 
-/* APPLICATION MODAL - WIDE LANDSCAPE */
+async function reset(e){
+e.preventDefault();
+setBusy(true);
+setErr('');
+setMsg('');
 
-/* APPLICATION MODAL - WIDE LANDSCAPE */
-.backdrop aside.application-modal{
-  background:#fff;
-  position:absolute;
-  left:50%;
-  top:50%;
-  right:auto;
-  width:min(1350px,92vw);
-  height:min(820px,90vh);
-  transform:translate(-50%,-50%);
-  padding:24px;
-  overflow:auto;
-  border-radius:18px;
-  box-shadow:0 18px 55px #0003;
+const{error}=await supabase.auth.resetPasswordForEmail(email,{
+redirectTo:window.location.origin+'/'
+});
+
+if(error)setErr(error.message);
+else setMsg('Reset link sent. Please open the newest email.');
+
+setBusy(false);
 }
-.application-modal .modal-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding-bottom:14px;
-  margin-bottom:14px;
-  border-bottom:1px solid #e5e7eb;
+
+if(forgot)
+return <div className="login">
+<form className="loginbox" onSubmit={reset}>
+<div className="logo">J</div>
+<h1>JOY ONLINE SERVICES</h1>
+<p>Reset Admin Password</p>
+
+<label>Email</label>
+<input
+type="email"
+required
+value={email}
+onChange={e=>setEmail(e.target.value)}
+/>
+
+{err&&<div className="err">{err}</div>}
+{msg&&<div className="success">{msg}</div>}
+
+<button className="primary" disabled={busy}>
+{busy?'Sending…':'Send Reset Link'}
+</button>
+
+<button
+type="button"
+className="secondary"
+onClick={()=>{
+setForgot(false);
+setErr('');
+setMsg('');
+}}>
+Back to Login
+</button>
+</form>
+</div>;
+
+return <div className="login">
+<form className="loginbox" onSubmit={login}>
+<div className="logo">J</div>
+<h1>JOY ONLINE SERVICES</h1>
+<p>Secure Admin Portal</p>
+
+<label>Email</label>
+<input
+type="email"
+required
+value={email}
+onChange={e=>setEmail(e.target.value)}
+/>
+
+<label>Password</label>
+<input
+type="password"
+required
+value={password}
+onChange={e=>setPassword(e.target.value)}
+/>
+
+{err&&<div className="err">{err}</div>}
+
+<button className="primary" disabled={busy}>
+{busy?'Signing in…':'Admin Login'}
+</button>
+
+<button
+type="button"
+className="linkbutton"
+onClick={()=>{
+setForgot(true);
+setErr('');
+}}>
+Forgot password?
+</button>
+</form>
+</div>;
 }
-.application-modal .modal-header b{font-size:16px;color:#111b3a}
-.application-modal .modal-header>div>div{margin-top:3px;color:#172554}
-.application-modal .modal-header>button{background:#eef2f7;font-size:20px;width:42px;height:42px;padding:0}
-.application-modal .modal-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
+
+
+function ResetPassword(){
+const[p,setP]=useState('');
+const[c,setC]=useState('');
+const[err,setErr]=useState('');
+const[msg,setMsg]=useState('');
+const[busy,setBusy]=useState(false);
+
+async function save(e){
+e.preventDefault();
+setErr('');
+setMsg('');
+
+if(p.length<6)
+return setErr('Password must be at least 6 characters.');
+
+if(p!==c)
+return setErr('Passwords do not match.');
+
+setBusy(true);
+
+const{error}=await supabase.auth.updateUser({
+password:p
+});
+
+if(error){
+setErr(error.message);
+}else{
+setMsg('Password changed successfully.');
+
+setTimeout(()=>{
+window.location.href=window.location.origin;
+},1500);
 }
-.application-modal .modal-panel{
-  background:#f8fafc;
-  border:1px solid #e5eaf2;
-  border-radius:12px;
-  padding:18px;
+
+setBusy(false);
 }
-.application-modal .modal-panel h3{
-  margin:0 0 16px;
-  color:#111b3a;
+
+return <div className="login">
+<form className="loginbox" onSubmit={save}>
+
+<div className="logo">J</div>
+<h1>JOY ONLINE SERVICES</h1>
+<p>Set New Admin Password</p>
+
+<label>New Password</label>
+<input
+type="password"
+minLength="6"
+required
+value={p}
+onChange={e=>setP(e.target.value)}
+/>
+
+<label>Confirm Password</label>
+<input
+type="password"
+minLength="6"
+required
+value={c}
+onChange={e=>setC(e.target.value)}
+/>
+
+{err&&<div className="err">{err}</div>}
+{msg&&<div className="success">{msg}</div>}
+
+<button className="primary" disabled={busy}>
+{busy?'Saving…':'Change Password'}
+</button>
+
+</form>
+</div>;
 }
-.application-details p{
-  display:grid;
-  grid-template-columns:170px 1fr;
-  gap:14px;
-  margin:0;
-  padding:7px 0;
-}
-.application-details p b{color:#111827}
-.application-details p span{color:#172554}
-.application-modal .field-row{
-  display:grid;
-  grid-template-columns:170px 1fr;
-  gap:14px;
-  align-items:center;
-  margin:7px 0;
-}
-.application-modal input,
-.application-modal select{
-  width:100%;
-}
-.application-modal .save-button{margin-top:12px}
-.application-modal .modal-right{display:flex;flex-direction:column;gap:14px}
-.application-modal .modal-actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-.application-modal .modal-actions button{min-height:46px}
-.application-modal .modal-panel>label{
-  display:block;
-  font-weight:700;
-  font-size:13px;
-  margin:10px 0 5px;
-}
-.application-modal .modal-panel>input[type=file]{
-  margin-top:10px;
-}
-.application-modal .modal-panel>p{
-  color:#64748b;
-  margin:10px 0 0;
-}
-.application-modal .uploaded-panel{flex:1}
-.application-modal .doc{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  background:#fff;
-}
-@media(max-width:900px){
-  .backdrop aside.application-modal{
-    width:94vw;
-    height:90vh;
+
+
+function App(){
+  const[session,setSession]=useState(null);
+  const[profile,setProfile]=useState(null);
+  const[loading,setLoading]=useState(true);
+  const[recovery,setRecovery]=useState(false);
+
+  useEffect(()=>{
+    let mounted=true;
+
+    async function init(){
+      try{
+        const hash=window.location.hash||'';
+        const params=new URLSearchParams(
+          hash.startsWith('#') ? hash.slice(1) : hash
+        );
+
+        const accessToken=params.get('access_token');
+        const refreshToken=params.get('refresh_token');
+        const type=params.get('type');
+
+        if(accessToken && refreshToken){
+          const{data,error}=await supabase.auth.setSession({
+            access_token:accessToken,
+            refresh_token:refreshToken
+          });
+
+          if(error){
+            console.error(error);
+          }else if(mounted){
+            setSession(data.session);
+            setRecovery(true);
+          }
+        }else{
+          const{data}=await supabase.auth.getSession();
+
+          if(mounted){
+            setSession(data.session);
+
+            if(type==='recovery'){
+              setRecovery(true);
+            }
+          }
+        }
+      }catch(error){
+        console.error(error);
+      }finally{
+        if(mounted)setLoading(false);
+      }
+    }
+
+    init();
+
+    const{data}=supabase.auth.onAuthStateChange((event,s)=>{
+      if(event==='PASSWORD_RECOVERY'){
+        setRecovery(true);
+      }
+
+      if(mounted)setSession(s);
+    });
+
+    return()=>{
+      mounted=false;
+      data.subscription.unsubscribe();
+    };
+  },[]);
+
+  useEffect(()=>{
+    if(!session){
+      setProfile(null);
+      return;
+    }
+
+    supabase
+      .from('profiles')
+      .select('id,full_name,role')
+      .eq('id',session.user.id)
+      .single()
+      .then(({data})=>{
+        setProfile(data);
+      });
+  },[session]);
+
+  if(loading){
+    return <div className="center">Loading…</div>;
   }
-  .application-modal .modal-grid{
-    grid-template-columns:1fr;
-  }
-}
-@media(max-width:600px){
-  .application-modal .application-details p,
-  .application-modal .field-row{
-    grid-template-columns:1fr;
-    gap:4px;
-  }
-  .application-modal .modal-actions{
-    grid-template-columns:1fr;
-  }
-}
 
-/* Final modal-only override */
-.backdrop aside.application-modal{
-  width:min(1400px,92vw) !important;
-  height:min(820px,90vh) !important;
-  left:50% !important;
-  top:50% !important;
-  right:auto !important;
-  transform:translate(-50%,-50%) !important;
-  overflow:auto !important;
-}
-.application-modal .modal-grid{
-  display:grid !important;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
-  gap:18px !important;
-  align-items:start !important;
-}
-.application-modal .modal-right{
-  display:flex !important;
-  flex-direction:column !important;
-  gap:16px !important;
-  min-width:0 !important;
-}
-.application-modal .modal-actions{
-  display:grid !important;
-  grid-template-columns:1fr 1fr !important;
-  gap:10px !important;
-}
-.application-modal .application-details p{
-  display:grid !important;
-  grid-template-columns:170px minmax(0,1fr) !important;
-  gap:14px !important;
-  margin:0 !important;
-  padding:7px 0 !important;
-}
-.application-modal .application-details input,
-.application-modal .application-details select{
-  width:100% !important;
-  box-sizing:border-box !important;
-}
-@media(max-width:900px){
-  .application-modal .modal-grid{
-    grid-template-columns:1fr !important;
+  if(recovery){
+    if(!session){
+      return <div className="center">Preparing secure password reset…</div>;
+    }
+
+    return <ResetPassword/>;
   }
-}
 
+  if(!session){
+    return <Login/>;
+  }
 
-/* NOTES PANEL — right side of application modal */
-.application-modal .notes-panel{
-  margin-top:0 !important;
+  if(!profile||profile.role!=='admin'){
+    return(
+      <div className="center">
+        <div className="card">
+          <h2>Access denied</h2>
+          <button onClick={()=>supabase.auth.signOut()}>
+            Sign out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return <Admin user={session.user} profile={profile}/>;
 }
-.application-modal .notes-panel h3{
-  margin:0 0 12px !important;
-}
-.application-modal .notes-panel textarea{
-  width:100% !important;
-  min-height:96px !important;
-  box-sizing:border-box !important;
-  resize:vertical !important;
-  padding:12px 14px !important;
-  border:1px solid #cbd5e1 !important;
-  border-radius:8px !important;
-  background:#fff !important;
-  color:#0f172a !important;
-  font:inherit !important;
-  outline:none !important;
-}
-.application-modal .notes-panel textarea:focus{
-  border-color:#93c5fd !important;
-  box-shadow:0 0 0 3px rgba(59,130,246,.10) !important;
-}
-@media(max-width:900px){
-  .application-modal .notes-panel textarea{
-    min-height:90px !important;
+function Admin({user,profile}){
+
+const[tab,setTab]=useState('dashboard');
+const [selectedService,setSelectedService]=useState(null);
+const[apps,setApps]=useState([]);
+const[selected,setSelected]=useState(null);
+const[appointments,setAppointments]=useState([]);
+const[appointment,setAppointment]=useState({
+  customer_name:'',
+  mobile:'',
+  service:'',
+  appointment_date:'',
+  appointment_time:'',
+  notes:''
+});
+const[appointmentBusy,setAppointmentBusy]=useState(false);
+
+async function loadAppointments(){
+  const{data,error}=await supabase
+    .from('appointments')
+    .select('*')
+    .order('appointment_date',{ascending:true})
+    .order('appointment_time',{ascending:true});
+
+  if(error){
+    alert(error.message);
+  }else{
+    setAppointments(data||[]);
   }
 }
 
+useEffect(()=>{
+  loadAppointments();
+},[]);
+async function saveAppointment(){
+  if(
+    !appointment.customer_name ||
+    !appointment.mobile ||
+    !appointment.service ||
+    !appointment.appointment_date ||
+    !appointment.appointment_time
+  ){
+    alert('Please fill all required fields');
+    return;
+  }
 
-/* ADHAR DICTIONARY — in-app reference book */
-.adhar-book{width:100%;min-height:calc(100vh - 40px)}
-.adhar-book-head{display:flex;align-items:center;gap:18px;margin-bottom:18px}
-.adhar-book-head button{border:0;background:#eaf1ff;color:#173b8f;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}
-.adhar-book-head h2{margin:0}.adhar-book-head p{margin:4px 0 0;color:#64748b}
-.adhar-book-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;align-items:start}
-.adhar-book-index{position:sticky;top:18px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:16px;box-shadow:0 8px 24px rgba(15,23,42,.06)}
-.adhar-book-index h3{margin:0 0 12px;color:#12244d}
-.adhar-book-index button{display:block;width:100%;text-align:left;border:0;background:transparent;color:#334155;padding:9px 8px;border-radius:8px;cursor:pointer;font-size:13px}
-.adhar-book-index button:hover{background:#edf4ff;color:#1769e0}
-.adhar-book-pages{background:#fff;border:1px solid #dbe4f0;border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(15,23,42,.07)}
-.adhar-book-cover{display:flex;align-items:center;gap:18px;padding:24px;border-radius:15px;background:linear-gradient(135deg,#eef5ff,#f8fbff);border:1px solid #dce9ff;margin-bottom:18px}
-.adhar-book-cover .book-icon{font-size:48px}.adhar-book-cover h1{margin:0;color:#123b8e;font-size:25px}
-.adhar-book-cover p{margin:5px 0;font-weight:700;color:#1e40af}.adhar-book-cover span{color:#64748b;font-size:13px}
-.adhar-book-section{padding:20px 0;border-bottom:1px solid #e5eaf1;scroll-margin-top:18px}
-.adhar-book-section:last-of-type{border-bottom:0}.adhar-book-section h3{margin:0 0 14px;color:#132750}
-.solution-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.solution-grid>div{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px}
-.solution-grid b{color:#17439b}.solution-grid p{margin:7px 0 0;color:#475569;line-height:1.55;font-size:13px}
-.adhar-warning{background:#fff8e8;border:1px solid #f3d38a;color:#6b4b00;padding:15px;border-radius:12px;line-height:1.55}
-.adhar-book-footer{display:flex;justify-content:space-between;gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid #e5eaf1;color:#64748b;font-size:12px}
-.adhar-book-footer b{color:#17439b}
-@media(max-width:900px){.adhar-book-layout{grid-template-columns:1fr}.adhar-book-index{position:static}.solution-grid{grid-template-columns:1fr}.adhar-book-cover{padding:18px}.adhar-book-cover h1{font-size:20px}}
+  setAppointmentBusy(true);
+
+  const { error } = await supabase
+    .from('appointments')
+    .insert([appointment]);
+
+  setAppointmentBusy(false);
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  alert('Appointment saved successfully!');
+
+  setAppointment({
+    customer_name:'',
+    mobile:'',
+    service:'',
+    appointment_date:'',
+    appointment_time:'',
+    notes:''
+  });
+
+  await loadAppointments();
+  setTab('appointments');
+}  
+async function load(){
+
+const{data,error}=await supabase
+.from('applications')
+.select('*')
+.order('created_at',{ascending:false});
+
+if(error)
+alert(error.message);
+else
+setApps(data||[]);
+
+}
+
+useEffect(()=>{
+load();
+},[]);
+
+const counts={
+total:apps.length,
+received:apps.filter(x=>x.status==='received').length,
+processing:apps.filter(x=>x.status==='processing').length,
+completed:apps.filter(x=>x.status==='completed').length,
+rejected:apps.filter(x=>x.status==='rejected').length
+};
+const now=new Date();
+
+const todayIncome=apps
+  .filter(a=>{
+    const d=new Date(a.created_at);
+    return d.toDateString()===now.toDateString();
+  })
+  .reduce((sum,a)=>sum+(Number(a.paid_paise)||0),0)/100;
+
+const monthIncome=apps
+  .filter(a=>{
+    const d=new Date(a.created_at);
+    return d.getMonth()===now.getMonth() &&
+           d.getFullYear()===now.getFullYear();
+  })
+  .reduce((sum,a)=>sum+(Number(a.paid_paise)||0),0)/100;
+
+const totalPaid=apps
+  .reduce((sum,a)=>sum+(Number(a.paid_paise)||0),0)/100;
+
+const totalBalance=apps
+  .reduce((sum,a)=>sum+
+    ((Number(a.fee_paise)||0)-(Number(a.paid_paise)||0)),0)/100;
+
+return <div className="app-shell">
+<aside className="sidebar">
+  <div className="brand">
+    <div className="brand-mark">JOY</div>
+    <div className="brand-sub">ONLINE SERVICES</div>
+  </div>
+  <nav>
+  {[
+    ['dashboard','⌂','Dashboard'],
+    ['appointments','▣','Appointments'],
+    ['applications','♙','Applications'],
+    ['new','＋','New Application'],
+    ['adharDictionary','▣','Adhar Dictionary']
+  ].map(([id,icon,label])=>
+    <button className={tab===id?'active':''} onClick={()=>setTab(id)} key={id}>
+      <span className="nav-icon">{icon}</span><span>{label}</span>
+    </button>
+  )}
+  </nav>
+  <div className="system-status">
+    <span className="status-dot"></span>
+    <div><strong>System Online</strong><small>All services running smoothly</small></div>
+  </div>
+</aside>
+<div className="app-content">
+<header>
+  <div className="mobile-brand">JOY ONLINE SERVICES</div>
+  <div className="topbar-right">
+    <div className="date-card">
+      <span className="date-icon">▣</span>
+      <div><small>Today</small><strong>{new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</strong></div>
+    </div>
+    <div className="admin-user">
+      <span className="admin-avatar">{(profile.full_name||'A').charAt(0).toUpperCase()}</span>
+      <strong>{'JOSHI JOY'}</strong>
+      <button onClick={()=>supabase.auth.signOut()}>Logout</button>
+    </div>
+  </div>
+</header>
+<main>
+
+{tab==='dashboard'&&<>
+<div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+  <h2>Dashboard</h2>
+  <button onClick={load}>🔄 Refresh</button>
+</div>
+<p>
+  {new Date().getHours() < 12
+    ? 'Good Morning'
+    : new Date().getHours() < 17
+    ? 'Good Afternoon'
+    : 'Good Evening'}
+  , {'JOSHI JOY'} 👋
+</p>
+  
+<div style={{marginBottom:'15px'}}>
+  📅 Today: {new Date().toLocaleDateString('en-IN')}
+</div>
+  
+<div className="stats">
+
+{Object.entries({
+Total:counts.total,
+Received:counts.received,
+Processing:counts.processing,
+Completed:counts.completed,
+Rejected:counts.rejected
+}).map(([k,v])=>
+<div className="stat" key={k}>
+<small>{k}</small>
+<strong>{v}</strong>
+</div>
+)}
+
+</div>
+<div className="stats">
+
+<div className="stat">
+<small>Today Applications</small>
+<strong>
+{apps.filter(a =>
+  a.created_at &&
+  new Date(a.created_at).toDateString() === new Date().toDateString()
+).length}
+</strong>
+</div>
+
+<div className="stat">
+<small>Today Pending</small>
+<strong>
+{apps.filter(a =>
+  a.created_at &&
+  new Date(a.created_at).toDateString() === new Date().toDateString() &&
+  (a.status === 'received' || a.status === 'processing')
+).length}
+</strong>
+</div>
+
+<div className="stat">
+<small>Today Completed</small>
+<strong>
+{apps.filter(a =>
+  a.created_at &&
+  new Date(a.created_at).toDateString() === new Date().toDateString() &&
+  a.status === 'completed'
+).length}
+</strong>
+</div>
+
+<div className="stat">
+<small>Today Collection</small>
+<strong>
+₹{(
+  apps
+    .filter(a =>
+      a.created_at &&
+      new Date(a.created_at).toDateString() === new Date().toDateString()
+    )
+    .reduce((sum, a) => sum + (Number(a.paid_paise) || 0), 0) / 100
+).toFixed(2)}
+</strong>
+</div>
+
+</div>
+<div className="stats">
+  <div className="stat">
+    <small>Today Income</small>
+    <strong>₹{todayIncome.toFixed(2)}</strong>
+  </div>
+
+  <div className="stat">
+    <small>Monthly Income</small>
+    <strong>₹{monthIncome.toFixed(2)}</strong>
+  </div>
+  <div className="stat">
+  <small>Total Paid</small>
+  <strong>
+    ₹{(apps.reduce((sum, a) => sum + (Number(a.paid_paise) || 0), 0) / 100).toFixed(2)}
+  </strong>
+</div>
+
+<div className="stat">
+  <small>Total Balance</small>
+  <strong>
+    ₹{(apps.reduce((sum, a) => sum + (Number(a.fee_paise) || 0), 0) / 100 -
+        apps.reduce((sum, a) => sum + (Number(a.paid_paise) || 0), 0) / 100).toFixed(2)}
+  </strong>
+</div>
+</div>
+
+<section className="services-section">
+{selectedService ? (
+  <div className="service-detail">
+    <button className="back-service" onClick={()=>setSelectedService(null)}>← Back to Services</button>
+    <div className="service-detail-heading">
+      <h2>{selectedService.name}</h2><p>Select a service to continue</p>
+    </div>
+    <div className="subservice-grid">
+      {selectedService.subServices.map((service)=>(
+        <div key={service.name} className="subservice-card"
+          onClick={()=>window.open(service.url,'_blank','noopener,noreferrer')}>
+          <div className="subservice-icon">→</div>
+          <strong>{service.name}</strong>
+          <span>Open Service</span>
+        </div>
+      ))}
+    </div>
+  </div>
+) : (
+  <>
+    <div className="services-heading">
+      <div>
+        <div className="services-title"><span>▦</span> Our Services</div>
+        <p>Click on any service to view options</p>
+      </div>
+      <div className="services-tag">FAST&nbsp; • &nbsp;SECURE&nbsp; • &nbsp;RELIABLE</div>
+    </div>
+    <div className="service-grid">
+      {[
+        {name:'Aadhaar Card',image:'/images/adhar-logo.webp',subServices:[
+          {name:'Aadhaar Update',url:'https://myaadhaar.uidai.gov.in/'},
+          {name:'Address Update',url:'https://myaadhaar.uidai.gov.in/'},
+          {name:'Mobile Update',url:'https://myaadhaar.uidai.gov.in/'},
+          {name:'Name Correction',url:'https://myaadhaar.uidai.gov.in/'},
+          {name:'DOB Correction',url:'https://myaadhaar.uidai.gov.in/'},
+          {name:'Download Aadhaar',url:'https://myaadhaar.uidai.gov.in/'}]},
+        {name:'PAN Card',image:'/images/pan-card.webp',subServices:[
+          {name:'New PAN Application',url:'https://panmitra.com/portallogin/login'},
+          {name:'PAN Correction',url:'https://panmitra.com/portallogin/login'},
+          {name:'PAN Download',url:'https://panmitra.com/portallogin/login'}]},
+        {name:'Voter Card',image:'/images/voter-card.webp',subServices:[
+          {name:'New Voter Registration',url:'https://voters.eci.gov.in/'},
+          {name:'Voter Correction',url:'https://voters.eci.gov.in/'},
+          {name:'Download e-EPIC',url:'https://voters.eci.gov.in/'}]},
+        {name:'Driving Licence',image:'/images/driving-licence.webp',subServices:[
+          {name:'Learner Licence',url:'https://sarathi.parivahan.gov.in/sarathiservice/stateSelection.do'},
+          {name:'DL Renewal',url:'https://sarathi.parivahan.gov.in/sarathiservice/stateSelection.do'},
+          {name:'DL Services',url:'https://sarathi.parivahan.gov.in/sarathiservice/stateSelection.do'}]}
+      ].map((service)=>(
+        <div key={service.name} className="service-card" onClick={()=>setSelectedService(service)}>
+          <div className="service-image-wrap"><img src={service.image} alt={service.name}/></div>
+          <strong>{service.name}</strong>
+          <div className="service-hint">Click to View Services</div>
+          <div className="service-arrow">→</div>
+        </div>
+      ))}
+    </div>
+  </>
+)}
+</section>
+
+<div className="appointment-box">
+<h3>📅 Appointments ({appointments.length})</h3>
+  <p>Manage today's appointments</p>
+<button onClick={() => setTab('appointments')}>
+  View Appointments
+  </button>
+</div>
+
+</>}
+
+{tab==='applications'&&
+<Applications
+apps={apps}
+refresh={load}
+select={setSelected}
+/>
+}
+
+{tab==='adharDictionary' && (
+  <section className="adhar-book">
+    <div className="adhar-book-head">
+      <button onClick={()=>setTab('dashboard')}>← Back to Dashboard</button>
+      <div>
+        <h2>📖 Adhar Dictionary</h2>
+        <p>Aadhaar problems &amp; practical solutions</p>
+      </div>
+    </div>
+
+    <div className="adhar-book-layout">
+      <aside className="adhar-book-index">
+        <h3>Contents</h3>
+        <button onClick={()=>document.getElementById('aadhaar-enrolment')?.scrollIntoView({behavior:'smooth'})}>1. Enrollment Problems</button>
+        <button onClick={()=>document.getElementById('aadhaar-update')?.scrollIntoView({behavior:'smooth'})}>2. Update Problems</button>
+        <button onClick={()=>document.getElementById('aadhaar-mobile')?.scrollIntoView({behavior:'smooth'})}>3. Mobile Problems</button>
+        <button onClick={()=>document.getElementById('aadhaar-dob-name')?.scrollIntoView({behavior:'smooth'})}>4. Name / DOB Problems</button>
+        <button onClick={()=>document.getElementById('aadhaar-address')?.scrollIntoView({behavior:'smooth'})}>5. Address Problems</button>
+        <button onClick={()=>document.getElementById('aadhaar-download')?.scrollIntoView({behavior:'smooth'})}>6. Download / PVC</button>
+        <button onClick={()=>document.getElementById('aadhaar-auth')?.scrollIntoView({behavior:'smooth'})}>7. OTP / Authentication</button>
+        <button onClick={()=>document.getElementById('aadhaar-escalation')?.scrollIntoView({behavior:'smooth'})}>8. When to Escalate</button>
+      </aside>
+
+      <div className="adhar-book-pages">
+        <div className="adhar-book-cover">
+          <div className="book-icon">📕</div>
+          <div>
+            <h1>AADHAAR PROBLEM SOLVING</h1>
+            <p>JOY ONLINE SERVICES — Adhar Dictionary</p>
+            <span>Quick reference guide for common Aadhaar service issues</span>
+          </div>
+        </div>
+
+        <article id="aadhaar-enrolment" className="adhar-book-section">
+          <h3>1. Aadhaar Enrollment Problems</h3>
+          <div className="solution-grid">
+            <div><b>Enrollment not completed</b><p>Check whether the enrollment was successfully submitted. Keep the acknowledgement / EID safely for status checking.</p></div>
+            <div><b>EID lost</b><p>Use the official UIDAI recovery/status options where available, or help the customer recover the enrolment details using the registered information.</p></div>
+            <div><b>Enrollment rejected</b><p>Check the rejection reason first. Correct the required information or documents and follow the official re-enrollment process.</p></div>
+          </div>
+        </article>
+
+        <article id="aadhaar-update" className="adhar-book-section">
+          <h3>2. Aadhaar Update Problems</h3>
+          <div className="solution-grid">
+            <div><b>Update not reflecting</b><p>Check update status using the acknowledgement details. If it is still under process, wait for processing before submitting another request.</p></div>
+            <div><b>Update rejected</b><p>Verify that the submitted information and supporting document match the requested update. Re-submit through an authorised UIDAI channel when required.</p></div>
+            <div><b>Document not accepted</b><p>Use an accepted Proof of Identity / Proof of Address document as applicable and ensure the document is clear and valid.</p></div>
+          </div>
+        </article>
+
+        <article id="aadhaar-mobile" className="adhar-book-section">
+          <h3>3. Mobile Number Problems</h3>
+          <div className="solution-grid">
+            <div><b>Mobile number not linked</b><p>Aadhaar OTP services require a registered mobile number. If the number is not linked or needs changing, use the authorised Aadhaar update process.</p></div>
+            <div><b>OTP not received</b><p>Check the registered mobile number, network, SMS availability and retry after a short interval. Never ask the customer to share an OTP with anyone.</p></div>
+          </div>
+        </article>
+
+        <article id="aadhaar-dob-name" className="adhar-book-section">
+          <h3>4. Name / Date of Birth Problems</h3>
+          <div className="solution-grid">
+            <div><b>Name correction</b><p>Verify the desired spelling against the supporting document and submit the correction through an authorised Aadhaar channel.</p></div>
+            <div><b>Date of Birth correction</b><p>Check the supporting DOB document and eligibility for the requested correction before submitting.</p></div>
+            <div><b>Mismatch in documents</b><p>First identify the exact mismatch. Use consistent information in the supporting document and application.</p></div>
+          </div>
+        </article>
+
+        <article id="aadhaar-address" className="adhar-book-section">
+          <h3>5. Address Problems</h3>
+          <div className="solution-grid">
+            <div><b>Address change</b><p>Use an accepted Proof of Address and enter the address carefully. Review spelling, PIN code and locality before submission.</p></div>
+            <div><b>Address update rejected</b><p>Check whether the submitted address proof is acceptable and whether the address entered matches the supporting document.</p></div>
+          </div>
+        </article>
+
+        <article id="aadhaar-download" className="adhar-book-section">
+          <h3>6. Aadhaar Download / PVC Problems</h3>
+          <div className="solution-grid">
+            <div><b>e-Aadhaar download issue</b><p>Use the official UIDAI portal and verify the Aadhaar details / OTP requirements before downloading.</p></div>
+            <div><b>PVC card issue</b><p>Check the official PVC order/status options and keep the request details for future reference.</p></div>
+            <div><b>Aadhaar print needed</b><p>After a successful download, print only the required copy and handle the customer's Aadhaar information securely.</p></div>
+          </div>
+        </article>
+
+        <article id="aadhaar-auth" className="adhar-book-section">
+          <h3>7. OTP / Authentication Problems</h3>
+          <div className="solution-grid">
+            <div><b>Authentication failed</b><p>Check the entered Aadhaar details, OTP or biometric conditions and retry through the official service.</p></div>
+            <div><b>Biometric authentication failed</b><p>Clean the fingers / scanner area and retry as appropriate. Repeated failures should be handled through the authorised Aadhaar support/update route.</p></div>
+          </div>
+        </article>
+
+        <article id="aadhaar-escalation" className="adhar-book-section">
+          <h3>8. When to Escalate</h3>
+          <div className="adhar-warning">
+            <b>Important:</b> Never guess, alter, or bypass UIDAI verification. For cases involving identity disputes, repeated rejection, locked/blocked access, or issues that cannot be resolved through the official process, guide the customer to the official UIDAI support / authorised centre.
+          </div>
+        </article>
+
+        <div className="adhar-book-footer">
+          <b>JOY ONLINE SERVICES</b>
+          <span>AADHAAR PROBLEM SOLVING • TELUGU SAMASYA PARISHKARAM</span>
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
+{tab==='appointments' && (
+  <div className="row">
+    <h2>📅 Appointments</h2>
+
+    <div className="card">
+      <h3>Today's Appointments</h3>
+
+{appointments.length === 0 ? (
+  <p>No appointments added yet.</p>
+) : (
+  <div className="appointment-list">
+    {appointments.map((a) => (
+      <div className="card" key={a.id} style={{marginTop:'15px'}}>
+        <h3>{a.customer_name}</h3>
+
+        <p><b>Mobile:</b> {a.mobile}</p>
+        <p><b>Service:</b> {a.service}</p>
+        <p><b>Date:</b> {a.appointment_date}</p>
+        <p><b>Time:</b> {a.appointment_time}</p>
+
+        {a.notes && (
+          <p><b>Notes:</b> {a.notes}</p>
+        )}
+      </div>
+    ))}
+  </div>
+)}
+      <button
+  className="primary"
+  onClick={() => setTab('newAppointment')}
+>
+  + New Appointment
+</button>
+
+      <button
+        onClick={() => setTab('dashboard')}
+      >
+        Back to Dashboard
+      </button>
+    </div>
+  </div>
+)}
+  {tab === 'newAppointment' && (
+  <div className="row">
+    <h2>📅 New Appointment</h2>
+
+    <div className="card">
+      <h3>Appointment Details</h3>
+
+      <label>Customer Name</label>
+      <input
+  type="text"
+  placeholder="Enter customer name"
+  value={appointment.customer_name}
+  onChange={e =>
+    setAppointment({...appointment, customer_name:e.target.value})
+  }
+/>
+
+      <label>Mobile Number</label>
+      <input
+  type="tel"
+  placeholder="Enter mobile number"
+  value={appointment.mobile}
+  onChange={e =>
+    setAppointment({...appointment, mobile:e.target.value})
+  }
+/>
+
+      <label>Service</label>
+      <input
+  type="text"
+  placeholder="Enter service"
+  value={appointment.service}
+  onChange={e =>
+    setAppointment({...appointment, service:e.target.value})
+  }
+/>
+
+      <label>Appointment Date</label>
+<input
+  type="date"
+  value={appointment.appointment_date}
+  onChange={e =>
+    setAppointment({
+      ...appointment,
+      appointment_date: e.target.value
+    })
+  }
+/>
+      <label>Appointment Time</label>
+<input
+  type="time"
+  value={appointment.appointment_time}
+  onChange={e =>
+    setAppointment({
+      ...appointment,
+      appointment_time: e.target.value
+    })
+  }
+/>
+      <label>Notes</label>
+      <textarea
+  rows="4"
+  placeholder="Enter notes"
+  value={appointment.notes}
+  onChange={e =>
+    setAppointment({
+      ...appointment,
+      notes: e.target.value
+    })
+  }
+/>
+
+      <br />
+
+      <button
+  className="primary"
+  onClick={saveAppointment}
+  disabled={appointmentBusy}
+>
+  {appointmentBusy ? 'Saving...' : 'Save Appointment'}
+</button>
+
+      <button onClick={() => setTab('appointments')}>
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
+  {tab==='new'&&
+<New
+userId={user.id}
+done={async()=>{
+await load();
+setTab('applications');
+}}
+/>
+}
+
+</main>
+
+{selected&&
+<Drawer
+app={selected}
+close={()=>setSelected(null)}
+refresh={load}
+/>
+}
+
+</div>
+</div>;
+}
+
+
+function Applications({apps,refresh,select}){
+  const [search,setSearch]=useState('');
+  const [statusFilter,setStatusFilter]=useState('All');
+  const [dateFilter,setDateFilter]=useState('All');
+const [customDate,setCustomDate]=useState('');
+
+  const filteredApps=apps.filter(a=>{
+  const appDate=a.created_at ? new Date(a.created_at) : null;
+  const today=new Date();
+
+  const sameDay=(d1,d2)=>
+    d1 && d2 && d1.toDateString()===d2.toDateString();
+
+  const dateMatch =
+    dateFilter==='All' ||
+    (dateFilter==='Today' && sameDay(appDate,today)) ||
+    (dateFilter==='Yesterday' &&
+      sameDay(
+        appDate,
+        new Date(today.getFullYear(),today.getMonth(),today.getDate()-1)
+      )
+    ) ||
+    (dateFilter==='This Month' &&
+      appDate &&
+      appDate.getMonth()===today.getMonth() &&
+      appDate.getFullYear()===today.getFullYear()
+    ) ||
+    (dateFilter==='Custom' &&
+      customDate &&
+      appDate &&
+      appDate.toISOString().slice(0,10)===customDate
+    );
+
+  return (
+    (statusFilter==='All' || a.status===statusFilter) &&
+    dateMatch &&
+    (
+      (a.customer_name||'').toLowerCase().includes(search.toLowerCase()) ||
+      (a.mobile||'').includes(search) ||
+      (a.application_no||'').toLowerCase().includes(search.toLowerCase())
+    )
+  );
+});
+
+  return <>
+    <div className="row">
+      <h2>Applications</h2>
+      <div className="row">
+  <button onClick={()=>setStatusFilter('All')}>All</button>
+  <button onClick={()=>setStatusFilter('pending')}>Pending</button>
+  <button onClick={()=>setStatusFilter('processing')}>Processing</button>
+  <button onClick={()=>setStatusFilter('completed')}>Completed</button>
+  <button onClick={()=>setStatusFilter('cancelled')}>Cancelled</button>
+  <button onClick={()=>setDateFilter('All')}>All Dates</button>
+<button onClick={()=>setDateFilter('Today')}>Today</button>
+<button onClick={()=>setDateFilter('Yesterday')}>Yesterday</button>
+<button onClick={()=>setDateFilter('This Month')}>This Month</button>
+<button onClick={()=>setDateFilter('Custom')}>Custom Date</button>
+
+{dateFilter==='Custom' && (
+  <input
+    type="date"
+    value={customDate}
+    onChange={e=>setCustomDate(e.target.value)}
+  />
+)}
+</div>
+
+      <input
+        type="text"
+        placeholder="Search customer, mobile or application no..."
+        value={search}
+        onChange={e=>setSearch(e.target.value)}
+      />
+
+      <button onClick={refresh}>Refresh</button>
+    </div>
+
+    <div className="card scroll">
+      <table>
+
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Customer</th>
+            <th>Mobile</th>
+            <th>Service</th>
+            <th>Total</th>
+            <th>Paid</th>
+            <th>Balance</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          {filteredApps.map(a=>
+            <tr key={a.id}>
+
+              <td onClick={()=>select(a)}>
+                {a.application_no}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                {a.customer_name}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                {a.mobile}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                {a.service}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                ₹{((a.fee_paise||0)/100).toFixed(2)}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                ₹{((a.paid_paise||0)/100).toFixed(2)}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                ₹{(((a.fee_paise||0)-(a.paid_paise||0))/100).toFixed(2)}
+              </td>
+
+              <td onClick={()=>select(a)}>
+                <span className={'status '+a.status}>
+                  {a.status}
+                </span>
+              </td>
+
+              <td>
+                <button
+                  onClick={async e=>{
+                    e.stopPropagation();
+
+                    if(!window.confirm('Delete this application?'))
+                      return;
+
+                    const {error}=await supabase
+                      .from('applications')
+                      .delete()
+                      .eq('id',a.id);
+
+                    if(error){
+                      alert(error.message);
+                    }else{
+                      alert('Application deleted');
+                      refresh();
+                    }
+                  }}
+                >
+                  🗑️ Delete
+                </button>
+              </td>
+
+            </tr>
+          )}
+
+          {!filteredApps.length &&
+            <tr>
+              <td colSpan="9">
+                No applications found.
+              </td>
+            </tr>
+          }
+
+        </tbody>
+      </table>
+    </div>
+  </>;
+}
+function New({userId,done}){
+
+const[f,setF]=useState({
+application_no:'',
+customer_name:'',
+mobile:'',
+service:'',
+address:'',
+notes:'',
+fee:'',
+});
+
+const[busy,setBusy]=useState(false);
+
+function ch(e){
+setF({
+...f,
+[e.target.name]:e.target.value
+});
+}
+
+async function save(e){
+
+e.preventDefault();
+setBusy(true);
+
+const{error}=await supabase
+.from('applications')
+.insert({
+application_no: f.application_no || `JOY-${Date.now().toString().slice(-6)}`,
+customer_id:userId,
+customer_name:f.customer_name,
+mobile:f.mobile,
+service:f.service,
+address:f.address||null,
+notes:f.notes||null,
+fee_paise:Math.round((Number(f.fee)||0)*100),
+payment_status:'unpaid',
+status:'received'
+});
+
+if(error){
+
+alert(error.message);
+
+}else{
+
+alert('Application created');
+await done();
+
+}
+
+setBusy(false);
+}
+
+return <>
+<h2>New Application</h2>
+
+<form className="card form" onSubmit={save}>
+
+<div>
+<label>Customer name</label>
+<input
+name="customer_name"
+value={f.customer_name}
+onChange={ch}
+required
+/>
+</div>
+
+<div>
+<label>Mobile</label>
+<input
+name="mobile"
+value={f.mobile}
+onChange={ch}
+required
+/>
+</div>
+
+<div>
+<label>Service</label>
+<select
+name="service"
+value={f.service}
+onChange={ch}
+required
+>
+<option value="">Select Service</option>
+<option value="Aadhaar Card">Aadhaar Card</option>
+<option value="PAN Card">PAN Card</option>
+<option value="Voter Card">Voter Card</option>
+<option value="Passport">Passport</option>
+<option value="Ration Card">Ration Card</option>
+<option value="BIRTH CERTIFICATE CORRECTION">BIRTH CERTIFICATE CORRECTION</option>
+<option value="AP STATE GAZZETTE">AP STATE GAZZETTE</option>
+<option value="Others">Others</option>
+</select>
+</div>
+
+<div>
+<label>Fee (₹)</label>
+<input
+name="fee"
+value={f.fee}
+onChange={ch}
+/>
+</div>
+<div className="full">
+  <label>Important Notes</label>
+  <textarea
+    name="notes"
+    rows="4"
+    placeholder="Enter important notes"
+    value={f.notes}
+    onChange={ch}
+  />
+</div>
+<div className="full">
+<label>Address</label>
+<textarea
+name="address"
+value={f.address}
+onChange={ch}
+/>
+</div>
+
+<div className="full">
+
+<button className="primary" disabled={busy}>
+{busy?'Creating…':'Create Application'}
+</button>
+
+</div>
+
+</form>
+</>;
+}
+
+
+function Drawer({app,close,refresh}){
+
+const[status,setStatus]=useState(app.status);
+const[docs,setDocs]=useState([]);
+const [documentType,setDocumentType]=useState('Other');
+const[paid,setPaid]=useState((app.paid_paise||0)/100);
+const[notes,setNotes]=useState(app.notes||'');
+const[uploading,setUploading]=useState(false);
+
+async function loadDocs(){
+const{data}=await supabase
+.from('documents')
+.select('*')
+.eq('application_id',app.id)
+.order('created_at',{ascending:false});
+setDocs(data||[]);
+}
+
+useEffect(()=>{
+loadDocs();
+},[app.id]);
+
+async function save(){
+const{error}=await supabase
+.from('applications')
+.update({
+status,
+paid_paise:Math.round((Number(paid)||0)*100),
+notes:notes||null,
+updated_at:new Date().toISOString()
+})
+.eq('id',app.id);
+
+if(error)
+alert(error.message);
+else{
+alert('Status updated');
+refresh();
+}
+}
+
+async function upload(file, documentType){
+if(!file)
+return;
+
+if(file.size>10*1024*1024)
+return alert('File must be 10 MB or smaller.');
+
+setUploading(true);
+
+const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+const path=`${app.id}/${Date.now()}-${safe}`;
+
+let r=await supabase.storage
+.from(BUCKET)
+.upload(path,file,{contentType:file.type});
+
+if(r.error){
+alert(r.error.message);
+}else{
+r=await supabase
+.from('documents')
+.insert({
+  application_id:app.id,
+  path,
+  name:file.name,
+  size:file.size,
+  document_type:documentType
+});
+
+if(r.error)
+alert(r.error.message);
+else
+await loadDocs();
+}
+
+setUploading(false);
+}
+
+async function view(d){
+const{data,error}=await supabase.storage
+.from(BUCKET)
+.createSignedUrl(d.path,120);
+
+if(error)
+alert(error.message);
+else
+window.open(data.signedUrl,'_blank');
+}
+
+return <div className="backdrop" onClick={close}>
+<aside className="application-modal" onClick={e=>e.stopPropagation()}>
+
+<div className="modal-header" style={{display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%"}}>
+<div>
+<b>{app.application_no}</b>
+<div>{app.customer_name}</div>
+</div>
+<button onClick={close}>✕</button>
+</div>
+
+<div className="modal-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"18px",alignItems:"start"}}>
+
+<section className="modal-panel application-details" style={{background:"#f8fafc",border:"1px solid #e5eaf2",borderRadius:"12px",padding:"20px"}}>
+<h3>Application Details</h3>
+
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Application No.</b><span>{app.application_no}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Customer Name</b><span>{app.customer_name}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Mobile</b><span>{app.mobile}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Service</b><span>{app.service}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Address</b><span>{app.address || 'Not provided'}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Application Date</b><span>{app.created_at ? new Date(app.created_at).toLocaleDateString('en-IN') : 'Not available'}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Payment Status</b><span>{app.payment_status}</span></p>
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Total Amount</b><span>₹{((app.fee_paise||0)/100).toFixed(2)}</span></p>
+
+<div className="field-row">
+<label><b>Paid Amount</b></label>
+<input
+type="number"
+min="0"
+step="0.01"
+value={paid}
+onChange={e=>setPaid(e.target.value)}
+/>
+</div>
+
+<p style={{display:"grid",gridTemplateColumns:"170px 1fr",gap:"14px",margin:"0",padding:"7px 0"}}><b>Balance</b><span>₹{(
+((app.fee_paise||0)/100) - (Number(paid)||0)
+).toFixed(2)}</span></p>
+
+<label><b>Status</b></label>
+<select value={status} onChange={e=>setStatus(e.target.value)}>
+<option>received</option>
+<option>processing</option>
+<option>completed</option>
+<option>rejected</option>
+</select>
+
+<button className="primary save-button" onClick={save}>
+Save
+</button>
+</section>
+
+<section className="modal-right" style={{display:"flex",flexDirection:"column",gap:"16px",minWidth:0}}>
+
+<div className="modal-actions" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px"}}>
+<button className="primary" onClick={()=>{
+const phone=(app.mobile||'').replace(/\D/g,'');
+window.open(`https://wa.me/91${phone}`,'_blank');
+}}>
+WhatsApp Customer
+</button>
+
+<button className="primary" onClick={() => window.print()}>
+Print Receipt
+</button>
+</div>
+
+<div className="modal-panel">
+<h3>Private Documents</h3>
+<label>Document Type</label>
+<select value={documentType} onChange={e=>setDocumentType(e.target.value)}>
+<option value="Aadhaar">Aadhaar</option>
+<option value="PAN">PAN</option>
+<option value="Voter ID">Voter ID</option>
+<option value="Photo">Photo</option>
+<option value="Signature">Signature</option>
+<option value="Other">Other</option>
+</select>
+
+<input
+type="file"
+accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+disabled={uploading}
+onChange={e=>upload(e.target.files?.[0],documentType)}
+/>
+
+<p>PDF/JPG/PNG, maximum 10 MB.</p>
+</div>
+
+<div className="modal-panel uploaded-panel">
+<h3>Uploaded Documents</h3>
+{docs.length===0&&<p>No documents uploaded.</p>}
+{docs.map(d=>
+<div className="doc" key={d.id}>
+<span>{d.name}</span>
+<button onClick={()=>view(d)}>View securely</button>
+</div>
+)}
+</div>
+
+<div className="modal-panel notes-panel">
+<h3>Notes</h3>
+<textarea
+value={notes}
+onChange={e=>setNotes(e.target.value)}
+placeholder="Enter important notes"
+rows="4"
+/>
+</div>
+
+</section>
+</div>
+</aside>
+</div>;
+}
+
+createRoot(
+document.getElementById('root')
+).render(<App/>);
