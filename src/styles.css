@@ -286,4 +286,4 @@ th,td{padding:13px;border-bottom:1px solid #eef0f3;text-align:left;white-space:n
 .adhar-warning{background:#fff8e8;border:1px solid #f3d38a;color:#6b4b00;padding:15px;border-radius:12px;line-height:1.55}
 .adhar-book-footer{display:flex;justify-content:space-between;gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid #e5eaf1;color:#64748b;font-size:12px}
 .adhar-book-footer b{color:#17439b}
-@media(max-width:900px){.adhar-book-layout{grid-template-columns:1fr}.adhar-book-index{position:static}.solution-grid{grid-template-columns:1fr}.adhar-book-cover{padding:18px}.adhar-book-cover h1{font-size:20px}} 
+@media(max-width:900px){.adhar-book-layout{grid-template-columns:1fr}.adhar-book-index{position:static}.solution-grid{grid-template-columns:1fr}.adhar-book-cover{padding:18px}.adhar-book-cover h1{font-size:20px}}
