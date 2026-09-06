@@ -430,9 +430,14 @@ const totalBalance=apps
 return <div className="app-shell">
 <aside className="sidebar">
   <div className="brand">
-    <div className="brand-mark">JOY</div>
-    <div className="brand-sub">ONLINE SERVICES</div>
-  </div>
+  <img
+    className="sidebar-logo"
+    src="/images/joy-online-logo.webp"
+    alt="JOY AADHAR AND ONLINE"
+  />
+  <div className="brand-mark">JOY</div>
+  <div className="brand-sub">ONLINE SERVICES</div>
+</div>
   <nav>
   {[
     ['dashboard','⌂','Dashboard'],
