@@ -307,3 +307,23 @@ th,td{padding:13px;border-bottom:1px solid #eef0f3;text-align:left;white-space:n
   object-fit:contain;
   display:block;
 }
+/* JOY SIDEBAR LOGO */
+.sidebar .brand{
+  text-align:center;
+}
+
+.sidebar-logo{
+  width:155px;
+  height:155px;
+  object-fit:contain;
+  display:block;
+  margin:0 auto 8px;
+}
+
+.sidebar .brand-mark{
+  font-size:38px;
+}
+
+.sidebar .brand-sub{
+  font-size:17px;
+}
