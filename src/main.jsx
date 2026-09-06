@@ -41,8 +41,9 @@ setBusy(false);
 if(forgot)
 return <div className="login">
 <form className="loginbox" onSubmit={reset}>
-<div className="logo">J</div>
-<h1>JOY ONLINE SERVICES</h1>
+<div className="logo">
+  <img src="/images/joy-online-logo.webp" alt="JOY ONLINE SERVICES" />
+</div><h1>JOY ONLINE SERVICES</h1>
 <p>Reset Admin Password</p>
 
 <label>Email</label>
@@ -75,8 +76,9 @@ Back to Login
 
 return <div className="login">
 <form className="loginbox" onSubmit={login}>
-<div className="logo">J</div>
-<h1>JOY ONLINE SERVICES</h1>
+<div className="logo">
+  <img src="/images/joy-online-logo.webp" alt="JOY ONLINE SERVICES" />
+</div><h1>JOY ONLINE SERVICES</h1>
 <p>Secure Admin Portal</p>
 
 <label>Email</label>
@@ -155,8 +157,9 @@ setBusy(false);
 return <div className="login">
 <form className="loginbox" onSubmit={save}>
 
-<div className="logo">J</div>
-<h1>JOY ONLINE SERVICES</h1>
+<div className="logo">
+  <img src="/images/joy-online-logo.webp" alt="JOY ONLINE SERVICES" />
+</div><h1>JOY ONLINE SERVICES</h1>
 <p>Set New Admin Password</p>
 
 <label>New Password</label>
