@@ -136,6 +136,8 @@ Forgot password?
 
 </div>;
 
+}
+
 
 function ResetPassword(){
 const[p,setP]=useState('');
