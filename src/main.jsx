@@ -75,10 +75,27 @@ Back to Login
 </div>;
 
 return <div className="login">
+
+<div className="login-promo">
+<img
+src="/images/robert-mark-brooks-login.webp"
+alt="Dr. Robert Mark Brooks"
+className="login-promo-image"
+/>
+</div>
+
+<div className="login-side">
+
 <form className="loginbox" onSubmit={login}>
+
 <div className="logo">
-  <img src="/images/joy-online-logo.webp" alt="JOY ONLINE SERVICES" />
-</div><h1>JOY ONLINE SERVICES</h1>
+<img
+src="/images/joy-online-logo.webp"
+alt="JOY ONLINE SERVICES"
+/>
+</div>
+
+<h1>JOY ONLINE SERVICES</h1>
 <p>Secure Admin Portal</p>
 
 <label>Email</label>
@@ -112,9 +129,12 @@ setErr('');
 }}>
 Forgot password?
 </button>
+
 </form>
+
+</div>
+
 </div>;
-}
 
 
 function ResetPassword(){
