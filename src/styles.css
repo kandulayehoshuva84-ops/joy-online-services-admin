@@ -327,3 +327,105 @@ th,td{padding:13px;border-bottom:1px solid #eef0f3;text-align:left;white-space:n
 .sidebar .brand-sub{
   font-size:17px;
 }
+/* ROBERT MARK BROOKS LOGIN DESIGN */
+
+.login{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  padding:0;
+  background:#f4f7fb;
+  overflow:hidden;
+}
+
+.login-promo{
+  min-height:100vh;
+  background:#111827;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.login-promo-image{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  display:block;
+}
+
+.login-side{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:35px;
+  background:#f4f8ff;
+}
+
+.login-side .loginbox{
+  width:min(470px,100%);
+  background:#fff;
+  padding:35px;
+  border-radius:22px;
+  box-shadow:0 18px 50px rgba(15,23,42,.12);
+}
+
+.login-side .logo{
+  width:100px;
+  height:100px;
+  background:#fff;
+  border-radius:50%;
+  padding:3px;
+  margin:0 auto 12px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  box-shadow:0 6px 20px rgba(0,0,0,.12);
+}
+
+.login-side .logo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
+.login-side .loginbox h1{
+  text-align:center;
+  color:#172554;
+  margin:10px 0 6px;
+}
+
+.login-side .loginbox>p{
+  text-align:center;
+  margin-bottom:24px;
+}
+
+/* MOBILE */
+@media(max-width:800px){
+  .login{
+    grid-template-columns:1fr;
+    overflow:auto;
+  }
+
+  .login-promo{
+    min-height:42vh;
+    height:42vh;
+  }
+
+  .login-promo-image{
+    object-fit:cover;
+    object-position:center;
+  }
+
+  .login-side{
+    min-height:58vh;
+    padding:22px 14px;
+  }
+
+  .login-side .loginbox{
+    padding:26px 20px;
+  }
+}
