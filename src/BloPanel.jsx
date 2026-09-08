@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { supabase } from './supabase';
+import BloMobileLink from './BloMobileLink';
 
 const BUCKET = 'Documents';
 const EMPTY_VOTER = {
@@ -103,7 +104,7 @@ export default function BloPanel({ user, onBack }) {
     w.document.close();
   }
   const nav = [
-    ['original','Voter Original'], ['search','Voter Search'], ['registration','New Voter Registration'], ['correction','Voter Correction'], ['deletion','Voter Deletion'], ['address','Address Change'], ['list','Voter List'], ['visit','Field Visit Report'], ['photo','Voter Photo Upload'], ['translator','Local Language / Translator'], ['print','Voter Details Print / PDF'], ['status','Pending / Approved / Rejected'], ['notices','BLO Notices'], ['profile','BLO Profile']
+    ['original','Voter Original'], ['search','Voter Search'], ['registration','New Voter Registration'], ['correction','Voter Correction'], ['deletion','Voter Deletion'], ['address','Address Change'], ['list','Voter List'], ['visit','Field Visit Report'], ['photo','Voter Photo Upload'], ['translator','Local Language / Translator'], ['print','Voter Details Print / PDF'], ['status','Pending / Approved / Rejected'], ['mobileLink','Link Mobile No. to Voter ID'], ['notices','BLO Notices'], ['profile','BLO Profile']
   ];
   const formTitle = editingId ? 'Edit Voter Record' : voter.request_type;
   return <section className="blo-panel">
@@ -114,6 +115,7 @@ export default function BloPanel({ user, onBack }) {
       {section==='search' && <SearchAndList title="Voter Search" items={filtered} search={search} setSearch={setSearch} statusFilter={statusFilter} setStatusFilter={setStatusFilter} onEdit={edit} onPrint={printRecord} />}
       {section==='list' && <SearchAndList title="Voter List" items={filtered} search={search} setSearch={setSearch} statusFilter={statusFilter} setStatusFilter={setStatusFilter} onEdit={edit} onPrint={printRecord} />}
       {section==='status' && <SearchAndList title="Application Status" items={filtered} search={search} setSearch={setSearch} statusFilter={statusFilter} setStatusFilter={setStatusFilter} onEdit={edit} onPrint={printRecord} />}
+      {section==='mobileLink' && <BloMobileLink user={user} />}
       {section==='visit' && <FieldVisit visit={visit} setField={setVisitField} busy={busy} onSave={saveVisit} visits={visits} />}
       {section==='photo' && <PhotoUpload editingId={editingId} voter={voter} onFile={uploadPhoto} busy={busy} />}
       {section==='translator' && <Translator voter={voter} setField={setField} />}
