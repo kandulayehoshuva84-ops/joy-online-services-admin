@@ -59,7 +59,7 @@ main{max-width:none;margin:0;padding:34px 42px 50px}main h2{font-size:28px;margi
 .services-section{margin-top:30px}.services-heading{display:flex;align-items:flex-end;justify-content:space-between;margin:0 4px 18px}
 .services-title{font-size:27px;font-weight:850;color:#14213d;display:flex;align-items:center;gap:12px}.services-title span{color:#1769ff;font-size:34px;line-height:1}
 .services-heading p{margin:4px 0 0 46px;color:#64748b;font-size:16px}.services-tag{font-size:13px;letter-spacing:2px;color:#7185a3;font-weight:800;padding-bottom:6px}
-.service-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.service-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
 .service-card{min-width:0;background:#fff;border:1px solid #edf0f5;border-radius:20px;padding:14px 14px 18px;text-align:center;cursor:pointer;box-shadow:0 6px 24px #0f172a0b;transition:.18s ease}
 .service-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px #0f172a16}
 .service-image-wrap{width:100%;height:230px;border-radius:15px;background:#f8fafc;display:flex;align-items:center;justify-content:center;margin-bottom:13px;overflow:hidden}
