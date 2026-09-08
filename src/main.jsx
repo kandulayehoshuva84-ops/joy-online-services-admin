@@ -1,6 +1,7 @@
 import React,{useEffect,useState}from'react';
 import{createRoot}from'react-dom/client';
 import{supabase}from'./supabase';
+import BloPanel from './BloPanel';
 import'./styles.css';
 
 const BUCKET='Documents';
@@ -609,6 +610,9 @@ Rejected:counts.rejected
 
 <section className="services-section">
 {selectedService ? (
+  selectedService.internal === 'blo' ? (
+    <BloPanel user={user} onBack={()=>setSelectedService(null)} />
+  ) : (
   <div className="service-detail">
     <button className="back-service" onClick={()=>setSelectedService(null)}>← Back to Services</button>
     <div className="service-detail-heading">
@@ -625,6 +629,7 @@ Rejected:counts.rejected
       ))}
     </div>
   </div>
+  )
 ) : (
   <>
     <div className="services-heading">
@@ -651,6 +656,7 @@ Rejected:counts.rejected
           {name:'New Voter Registration',url:'https://voters.eci.gov.in/'},
           {name:'Voter Correction',url:'https://voters.eci.gov.in/'},
           {name:'Download e-EPIC',url:'https://voters.eci.gov.in/'}]},
+        {name:'BLO',internal:'blo',subServices:[]},
         {name:'Driving Licence',image:'/images/driving-licence.webp',subServices:[
           {name:'Learner Licence',url:'https://sarathi.parivahan.gov.in/sarathiservice/stateSelection.do'},
           {name:'DL Renewal',url:'https://sarathi.parivahan.gov.in/sarathiservice/stateSelection.do'},
@@ -673,9 +679,9 @@ Rejected:counts.rejected
           {name:'IRCTC e-Ticket',url:'https://www.irctc.co.in/eticket/'}]}
       ].map((service)=>(
         <div key={service.name} className="service-card" onClick={()=>setSelectedService(service)}>
-          <div className="service-image-wrap"><img src={service.image} alt={service.name}/></div>
+          <div className="service-image-wrap">{service.internal==='blo' ? <div className="blo-service-mark">BLO<span>VOTER</span></div> : <img src={service.image} alt={service.name}/>}</div>
           <strong>{service.name}</strong>
-          <div className="service-hint">Click to View Services</div>
+          <div className="service-hint">{service.internal==='blo'?'Open Management Panel':'Click to View Services'}</div>
           <div className="service-arrow">→</div>
         </div>
       ))}
