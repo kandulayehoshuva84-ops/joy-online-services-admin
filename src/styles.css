@@ -35,7 +35,17 @@ button.primary{background:var(--navy);color:#fff}
 .app-content{flex:1;min-width:0}.app-content>header{height:76px;background:#fff;border-bottom:1px solid #e8edf4;padding:0 34px;display:flex;justify-content:flex-end;align-items:center}
 .topbar-right{display:flex;align-items:center;gap:24px}.date-card{display:flex;align-items:center;gap:10px;padding:10px 18px;border:1px solid #dbe7ff;background:#f7faff;border-radius:15px}
 .date-icon{font-size:25px;color:#1769ff}.date-card small{display:block;color:#1769ff;font-size:12px}.date-card strong{display:block;color:#173b75;font-size:15px;margin-top:2px}
-.admin-user{display:flex;align-items:center;gap:10px;color:#17213d}.admin-avatar{width:42px;height:42px;border-radius:50%;background:#4169e1;color:#fff;display:grid;place-items:center;font-size:18px;font-weight:700}
+.admin-user{display:flex;align-items:center;gap:10px;color:#17213d}..admin-avatar{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  object-fit:cover;
+  object-position:center 30%;
+  border:3px solid #2563eb;
+  background:#fff;
+  display:block;
+  box-shadow:0 3px 10px #2563eb25;
+}
 .admin-user button{background:transparent;color:#64748b;padding:7px 8px}.mobile-brand{display:none}
 main{max-width:none;margin:0;padding:34px 42px 50px}main h2{font-size:28px;margin:8px 0 24px;color:#14213d}main h3{color:#14213d}main p{color:#526b8b}
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
