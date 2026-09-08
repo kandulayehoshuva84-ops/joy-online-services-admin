@@ -487,8 +487,11 @@ return <div className="app-shell">
       <div><small>Today</small><strong>{new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</strong></div>
     </div>
     <div className="admin-user">
-      <span className="admin-avatar">{(profile.full_name||'A').charAt(0).toUpperCase()}</span>
-      <strong>{'JOSHI JOY'}</strong>
+<img
+  className="admin-avatar"
+  src="/images/admin-profile.jpg"
+  alt="JOSHI JOY"
+/>      <strong>{'JOSHI JOY'}</strong>
       <button onClick={()=>supabase.auth.signOut()}>Logout</button>
     </div>
   </div>
