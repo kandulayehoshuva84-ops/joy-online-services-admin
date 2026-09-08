@@ -35,7 +35,7 @@ button.primary{background:var(--navy);color:#fff}
 .app-content{flex:1;min-width:0}.app-content>header{height:76px;background:#fff;border-bottom:1px solid #e8edf4;padding:0 34px;display:flex;justify-content:flex-end;align-items:center}
 .topbar-right{display:flex;align-items:center;gap:24px}.date-card{display:flex;align-items:center;gap:10px;padding:10px 18px;border:1px solid #dbe7ff;background:#f7faff;border-radius:15px}
 .date-icon{font-size:25px;color:#1769ff}.date-card small{display:block;color:#1769ff;font-size:12px}.date-card strong{display:block;color:#173b75;font-size:15px;margin-top:2px}
-.admin-user{display:flex;align-items:center;gap:10px;color:#17213d}..admin-avatar{
+.admin-user{display:flex;align-items:center;gap:10px;color:#17213d}.admin-avatar{
   width:46px;
   height:46px;
   border-radius:50%;
