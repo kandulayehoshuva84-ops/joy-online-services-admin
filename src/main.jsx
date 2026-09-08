@@ -653,19 +653,19 @@ Rejected:counts.rejected
           {name:'DL Renewal',url:'https://sarathi.parivahan.gov.in/sarathiservice/stateSelection.do'},
           {name:'DL Services',url:'https://sarathi.parivahan.gov.in/sarathiservice/stateSelection.do'}]}
 ,
-        {name:'MeeSeva',image:'/images/meeseva.svg',subServices:[
+        {name:'MeeSeva',image:'/images/meeseva.png',subServices:[
           {name:'MeeSeva Portal',url:'https://onlineap.meeseva.gov.in/'},
           {name:'Application Status',url:'https://onlineap.meeseva.gov.in/'}]},
-        {name:'AP Seva Portal',image:'/images/ap-seva.svg',subServices:[
+        {name:'AP Seva Portal',image:'/images/ap-seva.png',subServices:[
           {name:'AP Seva Portal',url:'https://apseva.ap.gov.in/'},
           {name:'Application Status',url:'https://apseva.ap.gov.in/'}]},
-        {name:'Cards Adda',image:'/images/cards-adda.svg',subServices:[
+        {name:'Cards Adda',image:'/images/cards-adda.png',subServices:[
           {name:'Cards Adda Login',url:'https://cardsadda.in/'},
           {name:'Cards Adda Services',url:'https://cardsadda.in/'}]},
-        {name:'SeatSeller',image:'/images/seatseller.svg',subServices:[
-          {name:'SeatSeller Portal',url:'https://www.seatseller.travel/'},
-          {name:'SeatSeller Login',url:'https://www.seatseller.travel/'}]},
-        {name:'IRCTC',image:'/images/irctc.svg',subServices:[
+        {name:'SeatSeller',image:'/images/seatseller.png',subServices:[
+          {name:'SeatSeller Portal',url:'https://in3.seatseller.travel/ssui/NewLoginPage-iFrm'},
+          {name:'SeatSeller Login',url:'https:https://in3.seatseller.travel/ssui/NewLoginPage-iFrm'}]},
+        {name:'IRCTC',image:'/images/irctc.png',subServices:[
           {name:'IRCTC Website',url:'https://www.irctc.co.in/'},
           {name:'IRCTC e-Ticket',url:'https://www.irctc.co.in/eticket/'}]}
       ].map((service)=>(
