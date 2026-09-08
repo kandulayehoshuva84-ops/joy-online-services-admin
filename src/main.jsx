@@ -652,6 +652,22 @@ Rejected:counts.rejected
           {name:'Learner Licence',url:'https://sarathi.parivahan.gov.in/sarathiservice/stateSelection.do'},
           {name:'DL Renewal',url:'https://sarathi.parivahan.gov.in/sarathiservice/stateSelection.do'},
           {name:'DL Services',url:'https://sarathi.parivahan.gov.in/sarathiservice/stateSelection.do'}]}
+,
+        {name:'MeeSeva',image:'/images/meeseva.svg',subServices:[
+          {name:'MeeSeva Portal',url:'https://onlineap.meeseva.gov.in/'},
+          {name:'Application Status',url:'https://onlineap.meeseva.gov.in/'}]},
+        {name:'AP Seva Portal',image:'/images/ap-seva.svg',subServices:[
+          {name:'AP Seva Portal',url:'https://apseva.ap.gov.in/'},
+          {name:'Application Status',url:'https://apseva.ap.gov.in/'}]},
+        {name:'Cards Adda',image:'/images/cards-adda.svg',subServices:[
+          {name:'Cards Adda Login',url:'https://cardsadda.in/'},
+          {name:'Cards Adda Services',url:'https://cardsadda.in/'}]},
+        {name:'SeatSeller',image:'/images/seatseller.svg',subServices:[
+          {name:'SeatSeller Portal',url:'https://www.seatseller.travel/'},
+          {name:'SeatSeller Login',url:'https://www.seatseller.travel/'}]},
+        {name:'IRCTC',image:'/images/irctc.svg',subServices:[
+          {name:'IRCTC Website',url:'https://www.irctc.co.in/'},
+          {name:'IRCTC e-Ticket',url:'https://www.irctc.co.in/eticket/'}]}
       ].map((service)=>(
         <div key={service.name} className="service-card" onClick={()=>setSelectedService(service)}>
           <div className="service-image-wrap"><img src={service.image} alt={service.name}/></div>

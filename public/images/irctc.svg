@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360">
+<rect width="600" height="360" rx="38" fill="#f8fafc"/>
+<circle cx="300" cy="120" r="82" fill="#0f4c81"/>
+<path d="M244 139l18-55h77l18 55z" fill="#fff"/>
+<rect x="252" y="105" width="98" height="56" rx="8" fill="#dbeafe"/>
+<path d="M252 170h98" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+<circle cx="270" cy="180" r="14" fill="#fff"/><circle cx="332" cy="180" r="14" fill="#fff"/>
+<text x="300" y="267" text-anchor="middle" font-family="Arial,sans-serif" font-size="56" font-weight="800" fill="#0f4c81">IRCTC</text>
+<text x="300" y="312" text-anchor="middle" font-family="Arial,sans-serif" font-size="24" font-weight="600" fill="#1e40af">RAIL TICKETING</text>
+</svg>

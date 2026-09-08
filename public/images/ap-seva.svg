@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360">
+<rect width="600" height="360" rx="38" fill="#eff6ff"/>
+<circle cx="300" cy="126" r="82" fill="#2563eb"/>
+<path d="M250 145h100M270 105h60M260 175h80" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
+<path d="M245 82l55-35 55 35" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round"/>
+<text x="300" y="268" text-anchor="middle" font-family="Arial,sans-serif" font-size="52" font-weight="800" fill="#1d4ed8">AP SEVA</text>
+<text x="300" y="314" text-anchor="middle" font-family="Arial,sans-serif" font-size="24" font-weight="600" fill="#2563eb">GOVERNMENT SERVICES</text>
+</svg>

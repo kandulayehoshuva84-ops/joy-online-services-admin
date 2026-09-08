@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360">
+<rect width="600" height="360" rx="38" fill="#f0fdfa"/>
+<circle cx="300" cy="125" r="82" fill="#0f766e"/>
+<path d="M245 90h85c20 0 32 12 32 30v52h-24v-45c0-7-4-11-11-11h-82z" fill="#fff"/>
+<path d="M252 130h95v50h-95z" fill="#fff"/>
+<circle cx="265" cy="187" r="15" fill="#fff"/><circle cx="335" cy="187" r="15" fill="#fff"/>
+<text x="300" y="270" text-anchor="middle" font-family="Arial,sans-serif" font-size="52" font-weight="800" fill="#115e59">SeatSeller</text>
+<text x="300" y="314" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="600" fill="#0f766e">BUS TICKETING</text>
+</svg>
