@@ -1,24 +1,30 @@
 import React, { useMemo, useState } from 'react';
 
 const EMPTY = {
-  title: 'Document Template',
+  title: 'Sample Voter Information',
   reference: '',
   name: '',
-  date: '',
+  parentName: '',
+  dob: '',
+  age: '',
+  gender: '',
+  constituency: '',
+  partNo: '',
+  pollingStation: '',
+  pollingDate: '',
   address: '',
+  referenceDate: '',
   notes: ''
 };
 
-function esc(v) {
-  return String(v ?? '').replace(/[&<>"']/g, c =>
-    ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    }[c])
-  );
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
 }
 
 export default function TemplateProcessor({ onBack }) {
@@ -46,34 +52,36 @@ export default function TemplateProcessor({ onBack }) {
 
     reader.onload = () => {
       setter(String(reader.result || ''));
+      setMessage('');
+    };
+
+    reader.onerror = () => {
+      setMessage('Unable to read the selected file.');
     };
 
     reader.readAsDataURL(file);
   }
 
   const previewStyle = useMemo(
-    () =>
-      template
-        ? {
-            backgroundImage: `url(${template})`
-          }
-        : {},
+    () => template
+      ? { backgroundImage: `url(${template})` }
+      : {},
     [template]
   );
 
   function printDocument() {
     const photoHtml = photo
-      ? `<img src="${photo}" style="width:110px;height:130px;object-fit:cover;border:1px solid #999"/>`
-      : '';
+      ? `<img src="${photo}" class="photo" alt="Photo"/>`
+      : `<div class="photo-placeholder">PHOTO</div>`;
 
     const background = template
-      ? `background-image:url('${template}');background-size:100% 100%;background-repeat:no-repeat;`
+      ? `background-image:url('${template}');`
       : '';
 
-    const w = window.open('', '_blank', 'noopener,noreferrer');
+    const w = window.open('', '_blank');
 
     if (!w) {
-      setMessage('Allow pop-ups to open the printable document.');
+      setMessage('Please allow pop-ups to open the PDF preview.');
       return;
     }
 
@@ -81,67 +89,154 @@ export default function TemplateProcessor({ onBack }) {
 <!doctype html>
 <html>
 <head>
+<meta charset="UTF-8"/>
 <title>${esc(data.title)}</title>
 
 <style>
-
 @page {
   size: A4;
   margin: 0;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
+  background: #eee;
 }
 
 .page {
   width: 210mm;
   min-height: 297mm;
-  box-sizing: border-box;
-  padding: 22mm;
+  padding: 14mm;
   ${background}
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
-.box {
-  background: rgba(255,255,255,.92);
+.card {
+  background: rgba(255,255,255,.94);
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
   padding: 18px;
-  border: 1px solid #bbb;
 }
 
-.head {
+.header {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 20px;
+  border-bottom: 2px solid #172554;
+  padding-bottom: 14px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #172554;
+  margin-bottom: 8px;
+}
+
+.draft {
+  display: inline-block;
+  padding: 5px 9px;
+  border: 1px solid #b45309;
+  border-radius: 5px;
+  color: #92400e;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.reference {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #64748b;
 }
 
 .photo {
-  width: 110px;
+  width: 100px;
+  height: 120px;
+  object-fit: cover;
+  border: 1px solid #777;
+}
+
+.photo-placeholder {
+  width: 100px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #999;
+  color: #777;
+  font-size: 12px;
+}
+
+.section {
+  margin-top: 18px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #172554;
+  border-bottom: 1px solid #dbe3ee;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px 18px;
 }
 
 .field {
-  margin: 10px 0;
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 12px;
 }
 
 .label {
-  font-size: 12px;
-  color: #555;
+  color: #64748b;
+  font-weight: 700;
 }
 
 .value {
-  font-size: 16px;
-  font-weight: 600;
+  color: #111827;
   white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.full {
+  grid-column: 1 / -1;
 }
 
 .notice {
-  margin-top: 20px;
-  font-size: 11px;
+  margin-top: 22px;
+  padding: 10px;
+  border: 1px solid #dcaaaa;
+  background: #fff7f7;
   color: #8a1c1c;
-  border: 1px solid #d9a5a5;
-  padding: 8px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
 }
 
+.watermark {
+  margin-top: 16px;
+  text-align: center;
+  color: #991b1b;
+  font-size: 20px;
+  font-weight: 900;
+  opacity: .22;
+  transform: rotate(-8deg);
+}
 </style>
 </head>
 
@@ -149,57 +244,143 @@ body {
 
 <div class="page">
 
-<div class="box">
+  <div class="card">
 
-<div class="head">
+    <div class="header">
 
-<div>
+      <div>
+        <div class="title">
+          ${esc(data.title || 'Sample Voter Information')}
+        </div>
 
-<h1>${esc(data.title)}</h1>
+        <div class="draft">
+          SAMPLE / DRAFT
+        </div>
 
-<div class="field">
-<div class="label">Reference</div>
-<div class="value">${esc(data.reference)}</div>
-</div>
+        <div class="reference">
+          Reference: ${esc(data.reference || '-')}
+        </div>
+      </div>
 
-</div>
+      ${photoHtml}
 
-<div class="photo">
-${photoHtml}
-</div>
+    </div>
 
-</div>
+    <div class="section">
 
-<div class="field">
-<div class="label">Name</div>
-<div class="value">${esc(data.name)}</div>
-</div>
+      <div class="section-title">
+        PERSONAL DETAILS
+      </div>
 
-<div class="field">
-<div class="label">Date</div>
-<div class="value">${esc(data.date)}</div>
-</div>
+      <div class="grid">
 
-<div class="field">
-<div class="label">Address</div>
-<div class="value">${esc(data.address)}</div>
-</div>
+        <div class="field">
+          <div class="label">Name</div>
+          <div class="value">${esc(data.name || '-')}</div>
+        </div>
 
-<div class="field">
-<div class="label">Notes</div>
-<div class="value">${esc(data.notes)}</div>
-</div>
+        <div class="field">
+          <div class="label">Parent / Guardian</div>
+          <div class="value">${esc(data.parentName || '-')}</div>
+        </div>
 
-<div class="notice">
-SAMPLE / DRAFT — NOT AN OFFICIAL GOVERNMENT ID OR CERTIFICATE
-</div>
+        <div class="field">
+          <div class="label">DOB</div>
+          <div class="value">${esc(data.dob || '-')}</div>
+        </div>
 
-</div>
+        <div class="field">
+          <div class="label">Age</div>
+          <div class="value">${esc(data.age || '-')}</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Gender</div>
+          <div class="value">${esc(data.gender || '-')}</div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="section">
+
+      <div class="section-title">
+        ELECTION / POLLING INFORMATION
+      </div>
+
+      <div class="grid">
+
+        <div class="field">
+          <div class="label">Constituency</div>
+          <div class="value">${esc(data.constituency || '-')}</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Part No.</div>
+          <div class="value">${esc(data.partNo || '-')}</div>
+        </div>
+
+        <div class="field full">
+          <div class="label">Polling Station</div>
+          <div class="value">${esc(data.pollingStation || '-')}</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Polling Date</div>
+          <div class="value">${esc(data.pollingDate || '-')}</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Reference Date</div>
+          <div class="value">${esc(data.referenceDate || '-')}</div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="section">
+
+      <div class="section-title">
+        ADDRESS
+      </div>
+
+      <div class="field">
+        <div class="label">Address</div>
+        <div class="value">${esc(data.address || '-')}</div>
+      </div>
+
+    </div>
+
+    <div class="section">
+
+      <div class="section-title">
+        NOTES
+      </div>
+
+      <div class="value">
+        ${esc(data.notes || '-')}
+      </div>
+
+    </div>
+
+    <div class="notice">
+      SAMPLE / DRAFT — NOT AN OFFICIAL GOVERNMENT ID OR CERTIFICATE
+    </div>
+
+    <div class="watermark">
+      SAMPLE / DRAFT
+    </div>
+
+  </div>
 
 </div>
 
 <script>
-window.onload = () => window.print()
+window.onload = function () {
+  window.print();
+};
 </script>
 
 </body>
@@ -215,6 +396,21 @@ window.onload = () => window.print()
     setPhoto('');
     setMessage('Cleared.');
   }
+
+  const fields = [
+    ['title', 'Document Title'],
+    ['reference', 'Reference Number'],
+    ['name', 'Name'],
+    ['parentName', 'Parent / Guardian Name'],
+    ['dob', 'Date of Birth'],
+    ['age', 'Age'],
+    ['gender', 'Gender'],
+    ['constituency', 'Assembly Constituency'],
+    ['partNo', 'Part Number'],
+    ['pollingStation', 'Polling Station'],
+    ['pollingDate', 'Polling Date'],
+    ['referenceDate', 'Reference Date']
+  ];
 
   return (
     <section className="template-processor">
@@ -235,7 +431,7 @@ window.onload = () => window.print()
           </h2>
 
           <p>
-            Use only templates and information you are authorized to process.
+            Create authorized sample / draft documents.
           </p>
 
         </div>
@@ -248,7 +444,6 @@ window.onload = () => window.print()
 
       {message && (
         <div className="blo-message">
-
           {message}
 
           <button
@@ -257,7 +452,6 @@ window.onload = () => window.print()
           >
             ×
           </button>
-
         </div>
       )}
 
@@ -266,11 +460,10 @@ window.onload = () => window.print()
         <div className="card template-form-card">
 
           <h3>
-            1. Template & Images
+            1. Template & Photo
           </h3>
 
           <label>
-
             Background Template Image
 
             <input
@@ -284,16 +477,13 @@ window.onload = () => window.print()
                 )
               }
             />
-
           </label>
 
           <small>
-            Upload a blank/authorized template image.
-            PNG, JPG or WebP, max 8 MB.
+            Upload a blank / authorized template.
           </small>
 
           <label>
-
             Photo / Image
 
             <input
@@ -307,24 +497,17 @@ window.onload = () => window.print()
                 )
               }
             />
-
           </label>
 
           <small>
-            Photo is placed automatically in the preview.
+            Maximum photo size: 5 MB.
           </small>
 
           <h3>
             2. Fill Details
           </h3>
 
-          {[
-            ['title', 'Document Title'],
-            ['reference', 'Reference Number'],
-            ['name', 'Name'],
-            ['date', 'Date']
-          ].map(([key, label]) => (
-
+          {fields.map(([key, label]) => (
             <label key={key}>
 
               {label}
@@ -332,49 +515,35 @@ window.onload = () => window.print()
               <input
                 value={data[key]}
                 onChange={e =>
-                  setField(
-                    key,
-                    e.target.value
-                  )
+                  setField(key, e.target.value)
                 }
               />
 
             </label>
-
           ))}
 
           <label>
-
             Address
 
             <textarea
               rows="3"
               value={data.address}
               onChange={e =>
-                setField(
-                  'address',
-                  e.target.value
-                )
+                setField('address', e.target.value)
               }
             />
-
           </label>
 
           <label>
-
             Notes
 
             <textarea
               rows="3"
               value={data.notes}
               onChange={e =>
-                setField(
-                  'notes',
-                  e.target.value
-                )
+                setField('notes', e.target.value)
               }
             />
-
           </label>
 
           <div className="blo-actions">
@@ -410,75 +579,129 @@ window.onload = () => window.print()
                 <div>
 
                   <h1>
-                    {data.title || 'Document Template'}
+                    {data.title || 'Sample Voter Information'}
                   </h1>
 
+                  <span className="template-badge">
+                    SAMPLE / DRAFT
+                  </span>
+
                   <div className="preview-ref">
-                    {data.reference || 'Reference Number'}
+                    Reference: {data.reference || '-'}
                   </div>
 
                 </div>
 
                 {photo ? (
-
                   <img
                     className="template-photo"
                     src={photo}
                     alt="Uploaded"
                   />
-
                 ) : (
-
                   <div className="template-photo placeholder">
                     PHOTO
                   </div>
-
                 )}
 
               </div>
 
-              <div className="preview-field">
+              <div className="preview-section">
 
-                <b>Name</b>
+                <h3>PERSONAL DETAILS</h3>
 
-                <span>
-                  {data.name || 'Enter name'}
-                </span>
+                <div className="preview-grid">
+
+                  <div>
+                    <b>Name</b>
+                    <span>{data.name || '-'}</span>
+                  </div>
+
+                  <div>
+                    <b>Parent / Guardian</b>
+                    <span>{data.parentName || '-'}</span>
+                  </div>
+
+                  <div>
+                    <b>DOB</b>
+                    <span>{data.dob || '-'}</span>
+                  </div>
+
+                  <div>
+                    <b>Age</b>
+                    <span>{data.age || '-'}</span>
+                  </div>
+
+                  <div>
+                    <b>Gender</b>
+                    <span>{data.gender || '-'}</span>
+                  </div>
+
+                </div>
 
               </div>
 
-              <div className="preview-field">
+              <div className="preview-section">
 
-                <b>Date</b>
+                <h3>ELECTION / POLLING INFORMATION</h3>
 
-                <span>
-                  {data.date || 'Enter date'}
-                </span>
+                <div className="preview-grid">
+
+                  <div>
+                    <b>Constituency</b>
+                    <span>{data.constituency || '-'}</span>
+                  </div>
+
+                  <div>
+                    <b>Part No.</b>
+                    <span>{data.partNo || '-'}</span>
+                  </div>
+
+                  <div>
+                    <b>Polling Station</b>
+                    <span>{data.pollingStation || '-'}</span>
+                  </div>
+
+                  <div>
+                    <b>Polling Date</b>
+                    <span>{data.pollingDate || '-'}</span>
+                  </div>
+
+                  <div>
+                    <b>Reference Date</b>
+                    <span>{data.referenceDate || '-'}</span>
+                  </div>
+
+                </div>
 
               </div>
 
-              <div className="preview-field">
+              <div className="preview-section">
 
-                <b>Address</b>
+                <h3>ADDRESS</h3>
 
-                <span>
-                  {data.address || 'Enter address'}
-                </span>
+                <div className="preview-address">
+                  {data.address || '-'}
+                </div>
 
               </div>
 
-              <div className="preview-field">
+              <div className="preview-section">
 
-                <b>Notes</b>
+                <h3>NOTES</h3>
 
-                <span>
-                  {data.notes || 'Enter notes'}
-                </span>
+                <div className="preview-address">
+                  {data.notes || '-'}
+                </div>
 
               </div>
 
               <div className="sample-watermark">
                 SAMPLE / DRAFT
+              </div>
+
+              <div className="sample-warning">
+                SAMPLE / DRAFT — NOT AN OFFICIAL GOVERNMENT ID OR CERTIFICATE
               </div>
 
             </div>
