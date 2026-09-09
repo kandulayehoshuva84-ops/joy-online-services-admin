@@ -104,7 +104,7 @@ export default function BloPanel({ user, onBack }) {
     w.document.close();
   }
   const nav = [
-    ['original','Voter Original'], ['search','Voter Search'], ['registration','New Voter Registration'], ['correction','Voter Correction'], ['deletion','Voter Deletion'], ['address','Address Change'], ['list','Voter List'], ['visit','Field Visit Report'], ['photo','Voter Photo Upload'], ['translator','Local Language / Translator'], ['print','Voter Details Print / PDF'], ['status','Pending / Approved / Rejected'], ['mobileLink','Link Mobile No. to Voter ID'], ['notices','BLO Notices'], ['profile','BLO Profile']
+    ['original','Voter Original'],['template','Document Template Processor'], ['search','Voter Search'], ['registration','New Voter Registration'], ['correction','Voter Correction'], ['deletion','Voter Deletion'], ['address','Address Change'], ['list','Voter List'], ['visit','Field Visit Report'], ['photo','Voter Photo Upload'], ['translator','Local Language / Translator'], ['print','Voter Details Print / PDF'], ['status','Pending / Approved / Rejected'], ['mobileLink','Link Mobile No. to Voter ID'], ['notices','BLO Notices'], ['profile','BLO Profile']
   ];
   const formTitle = editingId ? 'Edit Voter Record' : voter.request_type;
   return <section className="blo-panel">
@@ -122,6 +122,7 @@ export default function BloPanel({ user, onBack }) {
       {section==='print' && <PrintSection items={voters} onPrint={printRecord} />}
       {section==='notices' && <Notices />}
       {section==='profile' && <Profile />}
+      {section==='template' && <TemplateProcessor onBack={() => setSection('original')} />}
     </div></div>
   </section>;
 }
