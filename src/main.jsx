@@ -2,6 +2,7 @@ import React,{useEffect,useState}from'react';
 import{createRoot}from'react-dom/client';
 import{supabase}from'./supabase';
 import BloPanel from './BloPanel';
+import TemplateProcessor from './TemplateProcessor';
 import'./styles.css';
 
 const BUCKET='Documents';
