@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { supabase } from './supabase';
 import BloMobileLink from './BloMobileLink';
+import TemplateProcessor from './TemplateProcessor';
 
 const BUCKET = 'Documents';
 const EMPTY_VOTER = {
