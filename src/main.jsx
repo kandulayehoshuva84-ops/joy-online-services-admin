@@ -879,7 +879,6 @@ select={setSelected}
       >
         Back to Dashboard
       </button>
-    </div>
   </div>
 )}
   {tab === 'newAppointment' && (
@@ -980,14 +979,13 @@ setTab('applications');
 />
 }
 
-</main>
 
 {selected&&
 <Drawer
 app={selected}
 close={()=>setSelected(null)}
 refresh={load}
-/>
+>
 }
 
 </div>
