@@ -867,20 +867,7 @@ select={setSelected}
 
   </div>
 )}
-      <button
-  className="primary"
-  onClick={() => setTab('newAppointment')}
->
-  + New Appointment
-</button>
-
-      <button
-        onClick={() => setTab('dashboard')}
-      >
-        Back to Dashboard
-      </button>
-  </div>
-)}
+     
   {tab === 'newAppointment' && (
   <div className="row">
     <h2>📅 New Appointment</h2>
@@ -982,10 +969,10 @@ setTab('applications');
 
 {selected&&
 <Drawer
-app={selected}
-close={()=>setSelected(null)}
-refresh={load}
->
+  app={selected}
+  close={()=>setSelected(null)}
+  refresh={load}
+/>
 }
 
 </div>
