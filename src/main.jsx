@@ -975,6 +975,7 @@ setTab('applications');
 />
 }
 
+</main>
 </div>
 </div>;
 }
