@@ -820,29 +820,51 @@ select={setSelected}
 
 {tab==='appointments' && (
   <div className="row">
+
     <h2>📅 Appointments</h2>
 
     <div className="card">
+
       <h3>Today's Appointments</h3>
 
-{appointments.length === 0 ? (
-  <p>No appointments added yet.</p>
-) : (
-  <div className="appointment-list">
-    {appointments.map((a) => (
-      <div className="card" key={a.id} style={{marginTop:'15px'}}>
-        <h3>{a.customer_name}</h3>
+      {appointments.length === 0 ? (
 
-        <p><b>Mobile:</b> {a.mobile}</p>
-        <p><b>Service:</b> {a.service}</p>
-        <p><b>Date:</b> {a.appointment_date}</p>
-        <p><b>Time:</b> {a.appointment_time}</p>
+        <p>No appointments added yet.</p>
 
-        {a.notes && (
-          <p><b>Notes:</b> {a.notes}</p>
-        )}
-      </div>
-    ))}
+      ) : (
+
+        <div className="appointment-list">
+
+          {appointments.map((a) => (
+
+            <AppointmentCard
+              key={a.id}
+              appointment={a}
+              refresh={loadAppointments}
+              goToApplications={() => setTab('applications')}
+            />
+
+          ))}
+
+        </div>
+
+      )}
+
+      <button
+        className="primary"
+        onClick={() => setTab('newAppointment')}
+      >
+        + New Appointment
+      </button>
+
+      <button
+        onClick={() => setTab('dashboard')}
+      >
+        Back to Dashboard
+      </button>
+
+    </div>
+
   </div>
 )}
       <button
@@ -972,6 +994,286 @@ refresh={load}
 </div>;
 }
 
+function AppointmentCard({appointment, refresh, goToApplications}) {
+
+  const [status, setStatus] = useState(
+    appointment.status || 'pending'
+  );
+
+  const [busy, setBusy] = useState(false);
+
+  async function updateStatus(newStatus) {
+
+    setStatus(newStatus);
+    setBusy(true);
+
+    const { error } = await supabase
+      .from('appointments')
+      .update({
+        status: newStatus
+      })
+      .eq('id', appointment.id);
+
+    setBusy(false);
+
+    if (error) {
+      alert(error.message);
+      setStatus(appointment.status || 'pending');
+      return;
+    }
+
+    await refresh();
+
+    // NOT VISITED stays in Appointments
+    if (newStatus === 'not_visited') {
+      return;
+    }
+
+    // Other status updates go directly to Applications
+    goToApplications();
+  }
+
+  return (
+    <div
+      className="card"
+      style={{
+        marginTop: '15px',
+        padding: '18px'
+      }}
+    >
+
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '20px',
+          flexWrap: 'wrap'
+        }}
+      >
+
+        <div>
+
+          <h3 style={{marginBottom:'8px'}}>
+            {appointment.customer_name}
+          </h3>
+
+          <p>
+            <b>Mobile:</b> {appointment.mobile}
+          </p>
+
+          <p>
+            <b>Service:</b> {appointment.service}
+          </p>
+
+          <p>
+            <b>Date:</b> {appointment.appointment_date}
+          </p>
+
+          <p>
+            <b>Time:</b> {appointment.appointment_time}
+          </p>
+
+          {appointment.notes && (
+            <p>
+              <b>Notes:</b> {appointment.notes}
+            </p>
+          )}
+
+        </div>
+
+        <div style={{minWidth:'200px'}}>
+
+          <label>
+            <b>Status Update</b>
+          </label>
+
+          <select
+            value={status}
+            disabled={busy}
+            onChange={e => updateStatus(e.target.value)}
+            style={{
+              width:'100%',
+              padding:'10px',
+              marginTop:'6px',
+              borderRadius:'8px'
+            }}
+          >
+
+            <option value="pending">
+              Select Status
+            </option>
+
+            <option value="visited">
+              Visited
+            </option>
+
+            <option value="not_visited">
+              Not Visited
+            </option>
+
+            <option value="resolution">
+              Resolution
+            </option>
+
+            <option value="cancelled">
+              Cancelled
+            </option>
+
+          </select>
+
+          {busy && (
+            <small>
+              Updating...
+            </small>
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+function AppointmentCard({appointment, refresh, goToApplications}) {
+
+  const [status, setStatus] = useState(
+    appointment.status || 'pending'
+  );
+
+  const [busy, setBusy] = useState(false);
+
+  async function updateStatus(newStatus) {
+
+    setStatus(newStatus);
+    setBusy(true);
+
+    const { error } = await supabase
+      .from('appointments')
+      .update({
+        status: newStatus
+      })
+      .eq('id', appointment.id);
+
+    setBusy(false);
+
+    if (error) {
+      alert(error.message);
+      setStatus(appointment.status || 'pending');
+      return;
+    }
+
+    await refresh();
+
+    if (newStatus === 'not_visited') {
+      return;
+    }
+
+    goToApplications();
+  }
+
+  return (
+    <div
+      className="card"
+      style={{
+        marginTop: '15px',
+        padding: '18px'
+      }}
+    >
+
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '20px',
+          flexWrap: 'wrap'
+        }}
+      >
+
+        <div>
+
+          <h3 style={{marginBottom:'8px'}}>
+            {appointment.customer_name}
+          </h3>
+
+          <p>
+            <b>Mobile:</b> {appointment.mobile}
+          </p>
+
+          <p>
+            <b>Service:</b> {appointment.service}
+          </p>
+
+          <p>
+            <b>Date:</b> {appointment.appointment_date}
+          </p>
+
+          <p>
+            <b>Time:</b> {appointment.appointment_time}
+          </p>
+
+          {appointment.notes && (
+            <p>
+              <b>Notes:</b> {appointment.notes}
+            </p>
+          )}
+
+        </div>
+
+        <div style={{minWidth:'200px'}}>
+
+          <label>
+            <b>Status Update</b>
+          </label>
+
+          <select
+            value={status}
+            disabled={busy}
+            onChange={e => updateStatus(e.target.value)}
+            style={{
+              width:'100%',
+              padding:'10px',
+              marginTop:'6px',
+              borderRadius:'8px'
+            }}
+          >
+
+            <option value="pending">
+              Select Status
+            </option>
+
+            <option value="visited">
+              Visited
+            </option>
+
+            <option value="not_visited">
+              Not Visited
+            </option>
+
+            <option value="resolution">
+              Resolution
+            </option>
+
+            <option value="cancelled">
+              Cancelled
+            </option>
+
+          </select>
+
+          {busy && (
+            <small>
+              Updating...
+            </small>
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
 
 function Applications({apps,refresh,select}){
   const [search,setSearch]=useState('');
