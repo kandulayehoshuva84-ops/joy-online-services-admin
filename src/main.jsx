@@ -409,8 +409,6 @@ async function saveImportantDate() {
   await loadImportantDates();
 }
 
-}
-
 async function loadAppointments(){
   const{data,error}=await supabase
     .from('appointments')
