@@ -408,7 +408,7 @@ async function saveImportantDate() {
 
   await loadImportantDates();
 }
-  await loadImportantDates();
+
 }
 
 async function loadAppointments(){
