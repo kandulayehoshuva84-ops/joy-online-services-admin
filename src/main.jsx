@@ -345,6 +345,72 @@ const[appointment,setAppointment]=useState({
   notes:''
 });
 const[appointmentBusy,setAppointmentBusy]=useState(false);
+  const[importantDates,setImportantDates]=useState([]);
+const[importantDate,setImportantDate]=useState({
+  date:'',
+  work:'',
+  remarks:'',
+  contact_number:'',
+  reminder_before:'1 Day'
+});
+const[importantDateBusy,setImportantDateBusy]=useState(false);
+
+async function loadImportantDates(){
+  const {data,error}=await supabase
+    .from('important_dates')
+    .select('*')
+    .order('date',{ascending:true});
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  setImportantDates(data||[]);
+}
+
+useEffect(()=>{
+  loadImportantDates();
+},[]);
+
+async function saveImportantDate(){
+
+  if(
+    !importantDate.date ||
+    !importantDate.work
+  ){
+    alert('Please enter Date and Work');
+    return;
+  }
+
+  setImportantDateBusy(true);
+
+  const {error}=await supabase
+    .from('important_dates')
+    .insert([{
+      ...importantDate,
+      created_by:user.id
+    }]);
+
+  setImportantDateBusy(false);
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  alert('Important Date saved successfully!');
+
+  setImportantDate({
+    date:'',
+    work:'',
+    remarks:'',
+    contact_number:'',
+    reminder_before:'1 Day'
+  });
+
+  await loadImportantDates();
+}
 
 async function loadAppointments(){
   const{data,error}=await supabase
@@ -469,6 +535,7 @@ return <div className="app-shell">
     ['applications','♙','Applications'],
     ['new','＋','New Application'],
     ['adharDictionary','▣','Adhar Dictionary']
+  ['importantDates','📅','Important Dates']
   ].map(([id,icon,label])=>
     <button className={tab===id?'active':''} onClick={()=>setTab(id)} key={id}>
       <span className="nav-icon">{icon}</span><span>{label}</span>
@@ -709,7 +776,217 @@ select={setSelected}
 />
 }
 
-{tab==='adharDictionary' && (
+{tab==='importantDates' && (
+  <section>
+
+    <div style={{
+      display:'flex',
+      justifyContent:'space-between',
+      alignItems:'center',
+      marginBottom:'20px',
+      flexWrap:'wrap',
+      gap:'10px'
+    }}>
+      <div>
+        <h2>📅 Important Dates</h2>
+        <p>Manage important customer follow-ups and reminders.</p>
+      </div>
+
+      <button
+        className="primary"
+        onClick={()=>setTab('newImportantDate')}
+      >
+        + Add Important Date
+      </button>
+    </div>
+
+    <div className="card">
+
+      <div style={{
+        overflowX:'auto'
+      }}>
+
+        <table style={{
+          width:'100%',
+          borderCollapse:'collapse'
+        }}>
+
+          <thead>
+            <tr>
+              <th style={{padding:'12px',textAlign:'left'}}>DATE</th>
+              <th style={{padding:'12px',textAlign:'left'}}>WORK</th>
+              <th style={{padding:'12px',textAlign:'left'}}>REMARKS</th>
+              <th style={{padding:'12px',textAlign:'left'}}>CONTACT NUMBER</th>
+              <th style={{padding:'12px',textAlign:'left'}}>REMINDER</th>
+              <th style={{padding:'12px',textAlign:'left'}}>STATUS</th>
+              <th style={{padding:'12px',textAlign:'left'}}>ACTION</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            {importantDates.length===0 ? (
+
+              <tr>
+                <td
+                  colSpan="7"
+                  style={{
+                    padding:'25px',
+                    textAlign:'center'
+                  }}
+                >
+                  No Important Dates added yet.
+                </td>
+              </tr>
+
+            ) : (
+
+              importantDates.map(item=>{
+
+                const today=new Date();
+                const target=new Date(item.date);
+
+                const diffDays=Math.ceil(
+                  (target-today)/(1000*60*60*24)
+                );
+
+                return (
+                  <tr key={item.id}>
+
+                    <td style={{padding:'12px'}}>
+                      {new Date(item.date).toLocaleDateString('en-IN')}
+                    </td>
+
+                    <td style={{
+                      padding:'12px',
+                      fontWeight:700
+                    }}>
+                      {item.work}
+                    </td>
+
+                    <td style={{padding:'12px'}}>
+                      {item.remarks || '—'}
+                    </td>
+
+                    <td style={{padding:'12px'}}>
+                      {item.contact_number || '—'}
+                    </td>
+
+                    <td style={{padding:'12px'}}>
+                      {item.reminder_before}
+                    </td>
+
+                    <td style={{padding:'12px'}}>
+
+                      {item.status==='completed' ? (
+
+                        <span style={{
+                          color:'#16803c',
+                          fontWeight:700
+                        }}>
+                          ✓ COMPLETED
+                        </span>
+
+                      ) : diffDays < 0 ? (
+
+                        <span style={{
+                          color:'#c62828',
+                          fontWeight:700
+                        }}>
+                          ⚠ OVERDUE
+                        </span>
+
+                      ) : (
+
+                        <span style={{
+                          color:'#d97706',
+                          fontWeight:700
+                        }}>
+                          PENDING
+                        </span>
+
+                      )}
+
+                    </td>
+
+                    <td style={{padding:'12px'}}>
+
+                      {item.status!=='completed' && (
+
+                        <button
+                          onClick={async()=>{
+
+                            const {error}=await supabase
+                              .from('important_dates')
+                              .update({
+                                status:'completed'
+                              })
+                              .eq('id',item.id);
+
+                            if(error){
+                              alert(error.message);
+                              return;
+                            }
+
+                            await loadImportantDates();
+
+                          }}
+                          style={{
+                            marginRight:'6px'
+                          }}
+                        >
+                          ✓ Complete
+                        </button>
+
+                      )}
+
+                      <button
+                        onClick={async()=>{
+
+                          if(!window.confirm(
+                            'Delete this Important Date?'
+                          )) return;
+
+                          const {error}=await supabase
+                            .from('important_dates')
+                            .delete()
+                            .eq('id',item.id);
+
+                          if(error){
+                            alert(error.message);
+                            return;
+                          }
+
+                          await loadImportantDates();
+
+                        }}
+                        style={{
+                          color:'#c62828'
+                        }}
+                      >
+                        Delete
+                      </button>
+
+                    </td>
+
+                  </tr>
+                );
+
+              })
+
+            )}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </section>
+)}
+  {tab==='adharDictionary' && (
   <section className="adhar-book">
     <div className="adhar-book-head">
       <button onClick={()=>setTab('dashboard')}>← Back to Dashboard</button>
@@ -956,6 +1233,113 @@ select={setSelected}
     </div>
   </div>
 )}
+{tab==='newImportantDate' && (
+  <div className="row">
+
+    <h2>📅 Add Important Date</h2>
+
+    <div className="card">
+
+      <h3>Important Date Details</h3>
+
+      <label>Date</label>
+
+      <input
+        type="date"
+        value={importantDate.date}
+        onChange={e =>
+          setImportantDate({
+            ...importantDate,
+            date:e.target.value
+          })
+        }
+      />
+
+      <label>Work</label>
+
+      <input
+        type="text"
+        placeholder="Enter work"
+        value={importantDate.work}
+        onChange={e =>
+          setImportantDate({
+            ...importantDate,
+            work:e.target.value
+          })
+        }
+      />
+
+      <label>Remarks</label>
+
+      <textarea
+        rows="3"
+        placeholder="Enter remarks"
+        value={importantDate.remarks}
+        onChange={e =>
+          setImportantDate({
+            ...importantDate,
+            remarks:e.target.value
+          })
+        }
+      />
+
+      <label>Contact Number</label>
+
+      <input
+        type="tel"
+        placeholder="Enter contact number"
+        value={importantDate.contact_number}
+        onChange={e =>
+          setImportantDate({
+            ...importantDate,
+            contact_number:e.target.value
+          })
+        }
+      />
+
+      <label>Reminder Before</label>
+
+      <select
+        value={importantDate.reminder_before}
+        onChange={e =>
+          setImportantDate({
+            ...importantDate,
+            reminder_before:e.target.value
+          })
+        }
+      >
+
+        <option>1 Day</option>
+        <option>10 Days</option>
+        <option>1 Month</option>
+        <option>3 Months</option>
+        <option>6 Months</option>
+        <option>1 Year</option>
+
+      </select>
+
+      <br />
+
+      <button
+        className="primary"
+        onClick={saveImportantDate}
+        disabled={importantDateBusy}
+      >
+        {importantDateBusy
+          ? 'Saving...'
+          : 'Save Important Date'}
+      </button>
+
+      <button
+        onClick={()=>setTab('importantDates')}
+      >
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+)}  
   {tab==='new'&&
 <New
 userId={user.id}
