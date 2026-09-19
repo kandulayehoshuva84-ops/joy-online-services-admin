@@ -534,7 +534,7 @@ return <div className="app-shell">
     ['appointments','▣','Appointments'],
     ['applications','♙','Applications'],
     ['new','＋','New Application'],
-    ['adharDictionary','▣','Adhar Dictionary']
+    ['adharDictionary','▣','Adhar Dictionary'],
   ['importantDates','📅','Important Dates']
   ].map(([id,icon,label])=>
     <button className={tab===id?'active':''} onClick={()=>setTab(id)} key={id}>
