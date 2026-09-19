@@ -373,42 +373,41 @@ useEffect(()=>{
   loadImportantDates();
 },[]);
 
-async function saveImportantDate(){
-
-  if(
-    !importantDate.date ||
-    !importantDate.work
-  ){
-    alert('Please enter Date and Work');
+async function saveImportantDate() {
+  if (!importantDate.date || !importantDate.work) {
+    alert("Please enter Date and Work");
     return;
   }
 
   setImportantDateBusy(true);
 
-  const {error}=await supabase
-    .from('important_dates')
+  const { error } = await supabase
+    .from("important_dates")
     .insert([{
       ...importantDate,
-      created_by:user.id
+      status: "pending",
+      created_by: user.id
     }]);
 
   setImportantDateBusy(false);
 
-  if(error){
+  if (error) {
     alert(error.message);
     return;
   }
 
-  alert('Important Date saved successfully!');
+  alert("Important Date saved successfully!");
 
   setImportantDate({
-    date:'',
-    work:'',
-    remarks:'',
-    contact_number:'',
-    reminder_before:'1 Day'
+    date: "",
+    work: "",
+    remarks: "",
+    contact_number: "",
+    reminder_before: "1 Day"
   });
 
+  await loadImportantDates();
+}
   await loadImportantDates();
 }
 
@@ -493,6 +492,40 @@ processing:apps.filter(x=>x.status==='processing').length,
 completed:apps.filter(x=>x.status==='completed').length,
 rejected:apps.filter(x=>x.status==='rejected').length
 };
+  function getReminderDate(date, reminder) {
+  const d = new Date(date);
+
+  switch (reminder) {
+    case '1 Day':
+      d.setDate(d.getDate() - 1);
+      break;
+
+    case '10 Days':
+      d.setDate(d.getDate() - 10);
+      break;
+
+    case '1 Month':
+      d.setMonth(d.getMonth() - 1);
+      break;
+
+    case '3 Months':
+      d.setMonth(d.getMonth() - 3);
+      break;
+
+    case '6 Months':
+      d.setMonth(d.getMonth() - 6);
+      break;
+
+    case '1 Year':
+      d.setFullYear(d.getFullYear() - 1);
+      break;
+
+    default:
+      break;
+  }
+
+  return d;
+}
 const now=new Date();
 
 const todayIncome=apps
@@ -843,12 +876,20 @@ select={setSelected}
 
               importantDates.map(item=>{
 
-                const today=new Date();
-                const target=new Date(item.date);
+                const today = new Date();
+const target = new Date(item.date);
+const reminderDate = getReminderDate(
+  item.date,
+  item.reminder_before
+);
 
-                const diffDays=Math.ceil(
-                  (target-today)/(1000*60*60*24)
-                );
+const diffDays = Math.ceil(
+  (target - today) / (1000 * 60 * 60 * 24)
+);
+
+const reminderDiffDays = Math.ceil(
+  (reminderDate - today) / (1000 * 60 * 60 * 24)
+);
 
                 return (
                   <tr key={item.id}>
